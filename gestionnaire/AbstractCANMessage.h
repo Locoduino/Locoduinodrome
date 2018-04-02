@@ -9,6 +9,8 @@
 #ifndef __ABSTRACT_CAN_MESSAGE_H__
 #define __ABSTRACT_CAN_MESSAGE_H__
 
+#include "Arduino.h"
+
 const uint8_t NO_SATELLITE_ID = 255;
 
 class AbstractCANOutSatelliteMessage
@@ -23,6 +25,7 @@ public:
   void setPointPosition(const bool inPosition);
   void setLED(const uint8_t inLED, const uint8_t inState);
   uint8_t satelliteId() { return mSatelliteId; }
+  void reserve(const uint8_t inSatelliteId) { mSatelliteId = inSatelliteId; }
 };
 
 #endif

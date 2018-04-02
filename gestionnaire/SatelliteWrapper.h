@@ -12,16 +12,18 @@
 #ifndef __SATELLITE_WRAPPER_H__
 #define __SATELLITE_WRAPPER_H__
 
+#include "Arduino.h"
+
 class PointWrapper
 {
 private:
   static PointWrapper *sPointList;
-  static PointWrapper *sPointTable;
-  static sint16_t sHigherPointNumber;
+  static PointWrapper **sPointTable;
+  static int16_t sHigherPointNumber;
 
-  sint16_t mPointNumber;    /* numéro de l'aiguillage dans le gestionnaire */
-  uint8_t  mSatelliteId;    /* indentifiant du satellite                   */
-  uint8_t  mSatelliteIndex; /* index du satellite dans la table            */
+  int16_t mPointNumber;    /* numéro de l'aiguillage dans le gestionnaire */
+  uint8_t mSatelliteId;    /* indentifiant du satellite                   */
+  uint8_t mSatelliteIndex; /* index du satellite dans la table            */
   PointWrapper *mNext;
 
   void setPosition(const bool inPosition);
@@ -41,7 +43,7 @@ public:
    * setPointPosition positionne l'aiguillage inPointNumber à la position
    * inPosition
    */
-  static void setPointPosition(const sint16_t inPointNumber, const bool inPosition);
+  static void setPointPosition(const int16_t inPointNumber, const bool inPosition);
 
   /*
    * constructeur

@@ -20,9 +20,25 @@ AbstractCANOutSatelliteMessage outSatellitesMessages[NUMBER_OF_SATELLITES];
 
 PointWrapper *PointWrapper::sPointList = NULL;
 PointWrapper **PointWrapper::sPointTable = NULL;
-sint16_t PointWrapper::sHigherPointNumber = -1;
+int16_t PointWrapper::sHigherPointNumber = -1;
 
 static const uint8_t NO_MESSAGE_INDEX = 255;
+
+/*
+ * Lookup the message table for a satellite Id 
+ */
+
+static uint8_t lookupMessageForId(const uint8_t inSatelliteId)
+{
+  for (uint8_t messIdx = 0; messIdx < NUMBER_OF_SATELLITES; messIdx++) {
+    if (outSatellitesMessages[messIdx].satelliteId() == inSatelliteId ||
+        outSatellitesMessages[messIdx].satelliteId() == NO_SATELLITE_ID)
+    {
+      return messIdx;
+    }
+  }
+  return NO_MESSAGE_INDEX; /* overflow */
+}
 
 /*
  * Constructeur.
@@ -74,7 +90,7 @@ void PointWrapper::begin()
 }
 
 void PointWrapper::setPointPosition(
-  const sint16_t inPointNumber,
+  const int16_t inPointNumber,
   const bool inPosition
 )
 {
@@ -88,11 +104,14 @@ void PointWrapper::setPointPosition(
 void PointWrapper::setPosition(const bool inPosition)
 {
   if (mSatelliteIndex != NO_MESSAGE_INDEX) {
-    outSatellitesMessages.[mSatelliteIndex]->setPointPosition(inPosition);
+    outSatellitesMessages[mSatelliteIndex].setPointPosition(inPosition);
   }
 }
 
 void PointWrapper::lookupMessage()
 {
   mSatelliteIndex = lookupMessageForId(mSatelliteId);
+  if (mSatelliteIndex != NO_MESSAGE_INDEX) {
+    outSatellitesMessages[mSatelliteIndex].reserve(mSatelliteId);
+  }
 }
