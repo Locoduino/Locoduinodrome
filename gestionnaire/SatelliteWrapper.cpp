@@ -25,7 +25,7 @@ int16_t PointWrapper::sHigherPointNumber = -1;
 static const uint8_t NO_MESSAGE_INDEX = 255;
 
 /*
- * Lookup the message table for a satellite Id 
+ * Lookup the message table for a satellite Id
  */
 
 static uint8_t lookupMessageForId(const uint8_t inSatelliteId)
@@ -75,7 +75,7 @@ void PointWrapper::begin()
   if (sHigherPointNumber != -1) {
     sPointTable = new PointWrapper*[sHigherPointNumber + 1];
     if (sPointTable != NULL) {
-      for (uint16_t i = 0; i <= sHigherPointNumber; i++) {
+      for (int16_t i = 0; i <= sHigherPointNumber; i++) {
         sPointTable[i] = NULL;
       }
       PointWrapper *currentPoint = sPointList;

@@ -52,4 +52,29 @@ public:
 
 };
 
+enum { SIGNAL_1 = 0, SIGNAL_2 = 1, SIGNAL_3 = 2 };
+
+class SignalWrapper
+{
+private:
+  static SignalWrapper *sSignalList;
+  static SignalWrapper **sSignalTable;
+  static uint16_t sHigherSignalNumber;
+
+  int16_t mSignalNumber;
+  uint8_t mSatelliteId;
+  uint8_t mSatelliteIndex;
+  uint8_t mSlot;
+  SignalWrapper *mNext;
+
+  void setState(const uint16_t inState);
+  void lookupMessage();
+
+public:
+  static void begin();
+  static void setSignalState(const uint16_t inState);
+
+  SignalWrapper(const uint16_t inSignalNumber, const uint8_t inSatelliteId, const uint8_t inSlot);
+};
+
 #endif /* __SATELLITE_WRAPPER_H__ */
