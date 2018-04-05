@@ -9,9 +9,6 @@
 #include "AbstractCANMessage.h"
 
 static const uint8_t NUMBER_OF_LED = 9;
-static const uint8_t LED_OFF = 0x0;
-static const uint8_t LED_BLINK = 0x1;
-static const uint8_t LED_ON = 0x2;
 
 AbstractCANOutSatelliteMessage::AbstractCANOutSatelliteMessage() :
   mSatelliteId(NO_SATELLITE_ID)

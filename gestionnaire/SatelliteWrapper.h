@@ -52,29 +52,88 @@ public:
 
 };
 
-enum { SIGNAL_1 = 0, SIGNAL_2 = 1, SIGNAL_3 = 2 };
+enum { SIGNAL_0 = 0, SIGNAL_1 = 1, SIGNAL_2 = 2 };
 
+/*-----------------------------------------------------------------------------
+ * La classe SignalWrapper est une classe abtraite représentant
+ * la correspondance entre un signal du gestionnaire et le signal matériel
+ * sur le satellite.
+ */
 class SignalWrapper
 {
 private:
   static SignalWrapper *sSignalList;
   static SignalWrapper **sSignalTable;
-  static uint16_t sHigherSignalNumber;
+  static int16_t sHigherSignalNumber;
 
-  int16_t mSignalNumber;
-  uint8_t mSatelliteId;
-  uint8_t mSatelliteIndex;
-  uint8_t mSlot;
+  int16_t mSignalNumber;    /* Numéro du signal dans le gestionnaire */
+  uint8_t mSatelliteId;     /* Identifiant du satellite sur lequel le signal est implanté */
   SignalWrapper *mNext;
 
-  void setState(const uint16_t inState);
+  virtual void setState(const uint16_t inState) = 0;
   void lookupMessage();
+
+protected:
+  uint8_t mSatelliteIndex;  /* Index du satellite dans la table */
+  uint8_t mSlot;            /* Slot / connecteur sur lequel le signal est connecté sur le satellite */
 
 public:
   static void begin();
-  static void setSignalState(const uint16_t inState);
+  static void setSignalState(const int16_t inSignalNumber, const uint16_t inState);
 
   SignalWrapper(const uint16_t inSignalNumber, const uint8_t inSatelliteId, const uint8_t inSlot);
+};
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les sémaphores : 3 feux, jaune, rouge, vert
+ */
+class SemaphoreSignalWrapper : public SignalWrapper
+{
+private:
+  virtual void setState(const uint16_t inState);
+
+public:
+  SemaphoreSignalWrapper(const uint16_t inSignalNumber, const uint8_t inSatelliteId, const uint8_t inSlot) :
+    SignalWrapper(inSignalNumber, inSatelliteId, inSlot) {}
+};
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les carrés
+ */
+class CarreSignalWrapper : public SignalWrapper
+{
+private:
+  virtual void setState(const uint16_t inState);
+
+public:
+  CarreSignalWrapper(const uint16_t inSignalNumber, const uint8_t inSatelliteId, const uint8_t inSlot) :
+    SignalWrapper(inSignalNumber, inSatelliteId, inSlot) {}
+};
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les s&maphores avec ralentissement
+ */
+class SemaphoreRalentissementSignalWrapper : public SignalWrapper
+{
+private:
+  virtual void setState(const uint16_t inState);
+
+public:
+  SemaphoreRalentissementSignalWrapper(const uint16_t inSignalNumber, const uint8_t inSatelliteId, const uint8_t inSlot) :
+    SignalWrapper(inSignalNumber, inSatelliteId, inSlot) {}
+};
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les s&maphores avec ralentissement
+ */
+class CarreRappelRalentissementSignalWrapper : public SignalWrapper
+{
+private:
+  virtual void setState(const uint16_t inState);
+
+public:
+  CarreRappelRalentissementSignalWrapper(const uint16_t inSignalNumber, const uint8_t inSatelliteId, const uint8_t inSlot) :
+    SignalWrapper(inSignalNumber, inSatelliteId, inSlot) {}
 };
 
 #endif /* __SATELLITE_WRAPPER_H__ */

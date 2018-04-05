@@ -12,17 +12,15 @@
 #include "SatelliteConfig.h"
 #include "SatelliteWrapper.h"
 #include "AbstractCANMessage.h"
+#include "Feux.h"
 
 /*
  * CAN messages
  */
 AbstractCANOutSatelliteMessage outSatellitesMessages[NUMBER_OF_SATELLITES];
 
-PointWrapper *PointWrapper::sPointList = NULL;
-PointWrapper **PointWrapper::sPointTable = NULL;
-int16_t PointWrapper::sHigherPointNumber = -1;
-
 static const uint8_t NO_MESSAGE_INDEX = 255;
+static const uint8_t NO_SATELLITE_INDEX = 255;
 
 /*
  * Lookup the message table for a satellite Id
@@ -40,6 +38,10 @@ static uint8_t lookupMessageForId(const uint8_t inSatelliteId)
   return NO_MESSAGE_INDEX; /* overflow */
 }
 
+PointWrapper *PointWrapper::sPointList = NULL;
+PointWrapper **PointWrapper::sPointTable = NULL;
+int16_t PointWrapper::sHigherPointNumber = -1;
+
 /*
  * Constructeur.
  *
@@ -54,7 +56,7 @@ PointWrapper::PointWrapper(
 ) :
 mPointNumber(inPointNumber),
 mSatelliteId(inSatelliteId),
-mSatelliteIndex(NO_MESSAGE_INDEX)
+mSatelliteIndex(NO_SATELLITE_INDEX)
 {
   /* Ajoute l'aiguillage dans la liste */
   mNext = sPointList;
@@ -113,5 +115,155 @@ void PointWrapper::lookupMessage()
   mSatelliteIndex = lookupMessageForId(mSatelliteId);
   if (mSatelliteIndex != NO_MESSAGE_INDEX) {
     outSatellitesMessages[mSatelliteIndex].reserve(mSatelliteId);
+  }
+}
+
+/*-----------------------------------------------------------------------------
+ * SignalWrapper class
+ *-----------------------------------------------------------------------------
+ */
+SignalWrapper *SignalWrapper::sSignalList = NULL;
+SignalWrapper **SignalWrapper::sSignalTable = NULL;
+int16_t SignalWrapper::sHigherSignalNumber = -1;
+
+void SignalWrapper::lookupMessage()
+{
+  mSatelliteIndex = lookupMessageForId(mSatelliteId);
+  if (mSatelliteIndex != NO_MESSAGE_INDEX) {
+    outSatellitesMessages[mSatelliteIndex].reserve(mSatelliteId);
+  }
+}
+
+void SignalWrapper::setSignalState(
+  const int16_t inSignalNumber,
+  const uint16_t inState
+)
+{
+  if (inSignalNumber >= 0 && inSignalNumber <= sHigherSignalNumber) {
+    if (sSignalTable[inSignalNumber] != NULL) {
+      sSignalTable[inSignalNumber]->setState(inState);
+    }
+  }
+}
+
+void SignalWrapper::begin()
+{
+  if (sHigherSignalNumber != -1) {
+    sSignalTable = new SignalWrapper*[sHigherSignalNumber + 1];
+    if (sSignalTable != NULL) {
+      for (int16_t i = 0; i <= sHigherSignalNumber; i++) {
+        sSignalTable[i] = NULL;
+      }
+      SignalWrapper *currentSignal = sSignalList;
+      while (currentSignal != NULL) {
+        sSignalTable[currentSignal->mSignalNumber] = currentSignal;
+        /* inscrit l'aiguillage dans la messagerie CAN */
+        currentSignal->lookupMessage();
+        currentSignal = currentSignal->mNext;
+      }
+    }
+  }
+}
+
+SignalWrapper::SignalWrapper(
+  const uint16_t inSignalNumber,
+  const uint8_t inSatelliteId,
+  const uint8_t inSlot
+) :
+mSignalNumber(inSignalNumber),
+mSatelliteId(inSatelliteId),
+mSlot(inSlot)
+{
+  /* Ajoute l'aiguillage dans la liste */
+  mNext = sSignalList;
+  sSignalList = this;
+  /* Note le max des identifiants d'aiguillage dans le gestionnaire */
+  if (mSignalNumber > sHigherSignalNumber) sHigherSignalNumber = mSignalNumber;
+}
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les sémaphores : 3 feux, jaune, rouge, vert
+ *
+ * L'ordre des LED sur le satellite est :
+ * - jaune
+ * - rouge
+ * - vert
+ */
+void SemaphoreSignalWrapper::setState(const uint16_t inState)
+{
+  if (mSatelliteIndex != NO_MESSAGE_INDEX) {
+    AbstractCANOutSatelliteMessage &message = outSatellitesMessages[mSatelliteIndex];
+    message.setLED(mSlot, inState & A ? LED_ON : LED_OFF);      /* jaune */
+    message.setLED(mSlot + 1, inState & S ? LED_ON : LED_OFF);  /* rouge */
+    message.setLED(mSlot + 2, inState & Vl ? LED_ON : LED_OFF); /* vert  */
+  }
+}
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les carrés
+ *
+ * L'ordre des LED sur le satellite est :
+ * - jaune
+ * - rouge
+ * - vert
+ * - rouge2
+ * - oeilleton (blanc)
+ */
+void CarreSignalWrapper::setState(const uint16_t inState)
+{
+  if (mSatelliteIndex != NO_MESSAGE_INDEX) {
+    AbstractCANOutSatelliteMessage &message = outSatellitesMessages[mSatelliteIndex];
+    message.setLED(mSlot, inState & A ? LED_ON : LED_OFF);        /* jaune */
+    message.setLED(mSlot + 1, inState & S ? LED_ON : inState & C ? LED_ON : LED_OFF);    /* rouge */
+    message.setLED(mSlot + 2, inState & Vl ? LED_ON : LED_OFF);   /* vert  */
+    message.setLED(mSlot + 3, inState & C ? LED_ON : LED_OFF);    /* rouge2 */
+    message.setLED(mSlot + 4, !(inState & C) ? LED_ON : LED_OFF); /* oeilleton */
+  }
+}
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les s&maphores avec ralentissement
+ *
+ * L'ordre des LED sur le satellite est :
+ * - jaune
+ * - rouge
+ * - vert
+ * - jaune2
+ * - jaune3
+ */
+void SemaphoreRalentissementSignalWrapper::setState(const uint16_t inState)
+{
+  if (mSatelliteIndex != NO_MESSAGE_INDEX) {
+    AbstractCANOutSatelliteMessage &message = outSatellitesMessages[mSatelliteIndex];
+    message.setLED(mSlot, inState & A ? LED_ON : LED_OFF);      /* jaune */
+    message.setLED(mSlot + 1, inState & S ? LED_ON : LED_OFF);  /* rouge */
+    message.setLED(mSlot + 2, inState & Vl ? LED_ON : LED_OFF); /* vert  */
+    message.setLED(mSlot + 3, inState & R ? LED_ON : inState & Rc ? LED_BLINK : LED_OFF);  /* jaune2 */
+    message.setLED(mSlot + 4, inState & R ? LED_ON : inState & Rc ? LED_BLINK : LED_OFF);  /* jaune3 */
+  }
+}
+
+/*-----------------------------------------------------------------------------
+ * Wrapper pour les carrés avec rappel ralentissement
+ *
+ * L'ordre des LED sur le satellite est :
+ * - jaune
+ * - rouge
+ * - vert
+ * - rouge2
+ * - jaune2
+ * - jaune3
+ * - oeilleton
+ */
+void CarreRappelRalentissementSignalWrapper::setState(const uint16_t inState)
+{
+  if (mSatelliteIndex != NO_MESSAGE_INDEX) {
+    AbstractCANOutSatelliteMessage &message = outSatellitesMessages[mSatelliteIndex];
+    message.setLED(mSlot, inState & A ? LED_ON : LED_OFF);      /* jaune */
+    message.setLED(mSlot + 1, inState & C ? LED_ON : LED_OFF);  /* rouge */
+    message.setLED(mSlot + 2, inState & Vl ? LED_ON : LED_OFF); /* vert  */
+    message.setLED(mSlot + 3, inState & C ? LED_ON : LED_OFF);  /* rouge2 */
+    message.setLED(mSlot + 4, inState & RR ? LED_ON : inState & RRc ? LED_BLINK : LED_OFF);  /* jaune2 */
+    message.setLED(mSlot + 5, inState & RR ? LED_ON : inState & RRc ? LED_BLINK : LED_OFF);  /* jaune3 */
   }
 }
