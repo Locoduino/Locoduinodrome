@@ -31,6 +31,7 @@
 #endif
 
 #include "Arduino.h"
+#include "EEPROM.h"
 
 #include "Objet.h"
 
@@ -53,22 +54,101 @@ const uint8_t aiguilles_pins[] = { A2 };
 const uint8_t zones_pins[] = { A5 };
 const uint8_t balises_pins[] = { A3, A4 };
 
+const char *EEPROM_ID = { "LCDO" };
+
 class Satellite
 {
+	// Identifiant du satellite
+	uint8_t		id;
+
+	// Liste de tous les objets gérés
 	Objet*		objets[NB_LEDS + NB_AIGUILLES + NB_ZONES + NB_BALISES];
 	uint8_t		nbObjets;
 
-	void AddObjetRange(Objet *inObjList, uint8_t inNb, const uint8_t *inPins)
+	void AddObjet(Objet *inpObjet, uint8_t inPin)
 	{
-		for (int i = 0; i < inNb; i++)
+		if (inpObjet != NULL && inPin != 255)
 		{
-			if (inPins[i] != 255)
-			{
-				inObjList[i].begin(inPins[i]);
-
-				objets[this->nbObjets++] = inObjList + i;
-			}
+			inpObjet->begin(inPin);
+			this->objets[this->nbObjets++] = inpObjet;
 		}
+	}
+
+	void EEPROM_sauvegarde()
+	{
+		int addr = 0;
+
+		////////////////////////////////////// Partie entête
+
+		/* Un descripteur du contenu est sauvé en premier.
+		Si ce descripteur n'est pas conforme à la lecture, alors l'EEPROM est considérée vierge.
+		Ca signifie aussi que changer la forme (nombre d'objets, taille d'un objet) annule toute sauvegarde !
+		*/
+
+		EEPROM.put(addr, (void *) EEPROM_ID, 4);
+		addr += 4;
+
+		EEPROM.write(addr++, this->nbObjets);
+
+		EEPROM.write(addr++, leds[0].GetEEPROMSize());
+		EEPROM.write(addr++, aiguilles[0].GetEEPROMSize());
+		EEPROM.write(addr++, balises[0].GetEEPROMSize());
+		EEPROM.write(addr++, zones[0].GetEEPROMSize());
+
+		////////////////////////////////////// Partie satellite
+
+		EEPROM.write(addr++, this->id);
+
+		////////////////////////////////////// Partie objets
+
+		for (int i = 0; i < this->nbObjets; i++)
+			addr = objets[i]->EEPROM_sauvegarde(addr);
+
+		//EEPROM.write(addr++, lowByte(tailles));
+		//EEPROM.write(addr++, highByte(tailles));
+	}
+
+	/* Chargement de la configuration depuis l'EEPROM. La fonction retourne true si tout est bien chargé. */
+	bool EEPROM_chargement()
+	{
+		int addr = 0;
+		char buf[5];
+
+		////////////////////////////////////// Partie entête
+
+		// ID EEPROM
+		EEPROM.get(addr, buf, 4);
+		addr += 4;
+		buf[4] = 0;
+
+		for (int i = 0; i < 4; i++)
+			if (buf[i] != EEPROM_ID[i])
+				return false;
+
+		// Nombre d'objets
+		uint8_t nb = EEPROM.read(addr++);
+		if (nb != this->nbObjets)
+			return false;
+
+		// taille des objets
+		EEPROM.get(addr, buf, 4);
+		addr += 4;
+
+		if (buf[0] != leds[0].GetEEPROMSize())	return false;
+		if (buf[1] != aiguilles[0].GetEEPROMSize())	return false;
+		if (buf[2] != balises[0].GetEEPROMSize())	return false;
+		if (buf[3] != zones[0].GetEEPROMSize())	return false;
+
+		////////////////////////////////////// Partie satellite
+
+		this->id = EEPROM.read(addr++);
+
+		////////////////////////////////////// Partie objets
+
+		for (int i = 0; i < this->nbObjets; i++)
+			addr = objets[i]->EEPROM_chargement(addr);
+
+		return true;
 	}
 
 public:
@@ -89,10 +169,14 @@ public:
 
 	void begin()
 	{
-		AddObjetRange(balises, NB_BALISES, balises_pins);
-		AddObjetRange(leds, NB_LEDS, leds_pins);
-		AddObjetRange(aiguilles, NB_AIGUILLES, aiguilles_pins);
-		AddObjetRange(zones, NB_ZONES, zones_pins);
+		this->nbObjets = 0;
+		for (int i = 0; i < NB_LEDS; i++)		this->AddObjet(&this->leds[i], leds_pins[i]);
+		for (int i = 0; i < NB_AIGUILLES; i++)	this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
+		for (int i = 0; i < NB_BALISES; i++)	this->AddObjet(&this->balises[i], balises_pins[i]);
+		for (int i = 0; i < NB_ZONES; i++)		this->AddObjet(&this->zones[i], zones_pins[i]);
+
+		if (EEPROM_chargement() == false)
+			EEPROM_sauvegarde();
 	}
 
 	void loop()

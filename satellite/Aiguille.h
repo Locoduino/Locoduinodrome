@@ -3,9 +3,14 @@
 */
 class Aiguille : public Objet
 {
+	unsigned int posDroit;
+	unsigned int posDeviee;
+
 public:
 	Aiguille()
 	{
+		this->posDroit = 700;
+		this->posDeviee = 2300;
 	}
 
 	void begin(uint8_t inPin)
@@ -16,6 +21,31 @@ public:
 
 	void loop()
 	{}
+
+	uint8_t GetEEPROMSize()	{ return Objet::GetEEPROMSize() + (2 * sizeof(unsigned int)); }
+
+	uint8_t EEPROM_chargement(int inAddr)
+	{
+		int addr = Objet::EEPROM_chargement(inAddr);
+
+		EEPROM.get(addr, &this->posDroit, sizeof(unsigned int));
+		addr += sizeof(unsigned int);
+		EEPROM.get(addr, &this->posDeviee, sizeof(unsigned int));
+		addr += sizeof(unsigned int);
+		return addr;
+	}
+
+	uint8_t EEPROM_sauvegarde(int inAddr)
+	{
+		int addr = Objet::EEPROM_sauvegarde(inAddr);
+
+		EEPROM.put(addr, &this->posDroit, sizeof(unsigned int));
+		addr += sizeof(unsigned int);
+		EEPROM.put(addr, &this->posDeviee, sizeof(unsigned int));
+		addr += sizeof(unsigned int);
+
+		return addr;
+	}
 
 	//void init(byte no) { /*direct=???*/ message(CODE_AIGUILLE_INIT,no,direct?1:0); }
 

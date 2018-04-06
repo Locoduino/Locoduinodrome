@@ -15,5 +15,10 @@ public:
 
 	virtual void begin(uint8_t inPin) = 0;
 	virtual void loop() = 0;
+
+	virtual uint8_t GetEEPROMSize() { return 0;	}
+
+	virtual uint8_t EEPROM_chargement(int inAddr) { return inAddr; }
+	virtual uint8_t EEPROM_sauvegarde(int inAddr) { return inAddr; }
 };
 
