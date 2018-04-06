@@ -30,6 +30,8 @@ public:
   void setLED(const uint8_t inLED, const uint8_t inState);
   uint8_t satelliteId() { return mSatelliteId; }
   void reserve(const uint8_t inSatelliteId) { mSatelliteId = inSatelliteId; }
+  void print();
+  void println() { print(); Serial.println(); }
 };
 
 #endif

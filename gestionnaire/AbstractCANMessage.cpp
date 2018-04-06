@@ -35,3 +35,14 @@ void AbstractCANOutSatelliteMessage::setLED(const uint8_t inLED, const uint8_t i
     mData[byteNum] |= ((inState & 0x03) << offsetInByte);
   }
 }
+
+void AbstractCANOutSatelliteMessage::print()
+{
+  Serial.print('<');
+  Serial.print(mSatelliteId);
+  Serial.print('>');
+  for (uint8_t i = 0; i < 3; i++) {
+    Serial.print("  ");
+    Serial.print(mData[i], BIN);
+  }
+}

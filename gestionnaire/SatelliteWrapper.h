@@ -14,6 +14,8 @@
 
 #include "Arduino.h"
 
+void printOutBuffers();
+
 class PointWrapper
 {
 private:
