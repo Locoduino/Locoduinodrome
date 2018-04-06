@@ -22,6 +22,24 @@ AbstractCANOutSatelliteMessage outSatellitesMessages[NUMBER_OF_SATELLITES];
 static const uint8_t NO_MESSAGE_INDEX = 255;
 static const uint8_t NO_SATELLITE_INDEX = 255;
 
+/* Envoi du message courant à destination des satellites */
+void sendSatelliteMessage()
+{
+  static uint8_t messageIndex = 0;
+  static uint32_t sendDate = 0;
+
+  if (millis() > sendDate) {
+    sendDate += OUT_MESSAGE_PERIOD;
+
+    uint32_t frameId =
+      (OUT_SATELLITE_MESSAGE_TYPE << NUMBER_OF_BITS_FOR_SATELLITE_ID) |
+      outSatellitesMessages[messageIndex].satelliteId();
+    /* passe au message suivant */
+    messageIndex++;
+    if (messageIndex == NUMBER_OF_SATELLITES) messageIndex = 0;
+  }
+}
+
 /*
  * Lookup the message table for a satellite Id
  */

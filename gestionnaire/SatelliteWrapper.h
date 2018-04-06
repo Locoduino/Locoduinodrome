@@ -14,6 +14,9 @@
 
 #include "Arduino.h"
 
+/* Send the current satellite message */
+void sendSatelliteMessage();
+
 class PointWrapper
 {
 private:
