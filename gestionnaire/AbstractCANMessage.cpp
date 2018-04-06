@@ -47,7 +47,7 @@ void AbstractCANOutSatelliteMessage::print()
     uint8_t ledState = (mData[element] >> offset) & 0x3;
     Serial.print('[');
     switch (ledState) {
-      case LED_OFF:   Serial.print('-'); break;
+      case LED_OFF:   Serial.print(' '); break;
       case LED_ON:    Serial.print('+'); break;
       case LED_BLINK: Serial.print('^'); break;
     }
