@@ -52,7 +52,7 @@ public:
 
 };
 
-enum { SIGNAL_0 = 0, SIGNAL_1 = 1, SIGNAL_2 = 2 };
+enum { SIGNAL_0 = 0, SIGNAL_1 = 3, SIGNAL_2 = 6 };
 
 /*-----------------------------------------------------------------------------
  * La classe SignalWrapper est une classe abtraite représentant
