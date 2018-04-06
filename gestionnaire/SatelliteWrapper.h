@@ -16,6 +16,8 @@
 
 /* Send the current satellite message */
 void sendSatelliteMessage();
+/* Debug function to examine buffers */
+void printOutBuffers();
 
 class PointWrapper
 {

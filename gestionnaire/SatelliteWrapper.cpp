@@ -34,10 +34,22 @@ void sendSatelliteMessage()
     uint32_t frameId =
       (OUT_SATELLITE_MESSAGE_TYPE << NUMBER_OF_BITS_FOR_SATELLITE_ID) |
       outSatellitesMessages[messageIndex].satelliteId();
+    
     /* passe au message suivant */
     messageIndex++;
     if (messageIndex == NUMBER_OF_SATELLITES) messageIndex = 0;
   }
+}
+
+void printOutBuffers()
+{
+  for (uint8_t i = 0; i < 43; i++) Serial.print('-');
+  Serial.println();
+  for (uint8_t i = 0; i < NUMBER_OF_SATELLITES; i++) {
+    outSatellitesMessages[i].println();
+  }
+  for (uint8_t i = 0; i < 43; i++) Serial.print('-');
+  Serial.println();
 }
 
 /*

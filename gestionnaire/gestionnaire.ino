@@ -3,6 +3,7 @@
  */
  
 #include "SatelliteWrapper.h"
+#include "Feux.h"
 
 /*
  *  Les aiguillages
@@ -26,8 +27,21 @@ SemaphoreRalentissementSignalWrapper    S4wrapper(9, 4, SIGNAL_1); /* signal 9 d
 
 void setup()
 {
+  Serial.begin(115200);
+  
   PointWrapper::begin();
   SignalWrapper::begin();
+
+  printOutBuffers();
+
+  PointWrapper::setPointPosition(0,true);
+
+  printOutBuffers();
+
+  SignalWrapper::setSignalState(0, Vl);
+
+  printOutBuffers();
+  
 }
 
 void loop()

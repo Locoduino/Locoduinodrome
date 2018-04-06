@@ -1,0 +1,23 @@
+// Programme pour les cartes satellite du Locoduinodrome
+// Thierry 04 Avril 2018
+// Copyright Locoduinp 2018
+// Version 0.0
+
+#include "Satellite.h"
+
+Satellite sat;
+
+void setup()
+{ 
+	sat.begin();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+void loop() 
+{
+	sat.loop();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
