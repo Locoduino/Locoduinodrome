@@ -24,12 +24,12 @@ static const uint8_t NO_SATELLITE_INDEX = 255;
 
 void printOutBuffers()
 {
-  for (uint8_t i = 0; i < 40; i++) Serial.print('-');
+  for (uint8_t i = 0; i < 43; i++) Serial.print('-');
   Serial.println();
   for (uint8_t i = 0; i < NUMBER_OF_SATELLITES; i++) {
     outSatellitesMessages[i].println();
   }
-  for (uint8_t i = 0; i < 40; i++) Serial.print('-');
+  for (uint8_t i = 0; i < 43; i++) Serial.print('-');
   Serial.println();
 }
 

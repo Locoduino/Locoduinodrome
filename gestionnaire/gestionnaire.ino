@@ -3,6 +3,7 @@
  */
  
 #include "SatelliteWrapper.h"
+#include "Feux.h"
 
 /*
  *  Les aiguillages
@@ -36,6 +37,11 @@ void setup()
   PointWrapper::setPointPosition(0,true);
 
   printOutBuffers();
+
+  SignalWrapper::setSignalState(0, Vl);
+
+  printOutBuffers();
+  
 }
 
 void loop()

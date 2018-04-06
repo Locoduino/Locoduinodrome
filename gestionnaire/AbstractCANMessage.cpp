@@ -30,7 +30,7 @@ void AbstractCANOutSatelliteMessage::setLED(const uint8_t inLED, const uint8_t i
 {
   if (inLED <= 9) {
     uint8_t byteNum = inLED >> 2;
-    uint8_t offsetInByte = inLED & 0x03;
+    uint8_t offsetInByte = (inLED & 0x03) << 1;
     mData[byteNum] &= ~(0x03 << offsetInByte); /* reset */
     mData[byteNum] |= ((inState & 0x03) << offsetInByte);
   }
@@ -40,9 +40,20 @@ void AbstractCANOutSatelliteMessage::print()
 {
   Serial.print('<');
   Serial.print(mSatelliteId);
-  Serial.print('>');
-  for (uint8_t i = 0; i < 3; i++) {
-    Serial.print("  ");
-    Serial.print(mData[i], BIN);
+  Serial.print("> ");
+  for (uint8_t led = 0; led < 9; led++) {
+    uint8_t element = led >> 2;
+    uint8_t offset = (led & 0x3) << 1;
+    uint8_t ledState = (mData[element] >> offset) & 0x3;
+    Serial.print('[');
+    switch (ledState) {
+      case LED_OFF:   Serial.print('-'); break;
+      case LED_ON:    Serial.print('+'); break;
+      case LED_BLINK: Serial.print('^'); break;
+    }
+    Serial.print("] ");
   }
+  Serial.print('<');
+  Serial.print(mData[2] & 0x80 ? '/' : '|');
+  Serial.print('>');
 }
