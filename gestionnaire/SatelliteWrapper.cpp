@@ -32,7 +32,7 @@ void sendSatelliteMessage()
     sendDate += OUT_MESSAGE_PERIOD;
 
     outSatellitesMessages[messageIndex].send();
-    
+
     /* passe au message suivant */
     messageIndex++;
     if (messageIndex == NUMBER_OF_SATELLITES) messageIndex = 0;
@@ -245,7 +245,7 @@ void CarreSignalWrapper::setState(const uint16_t inState)
     message.setLED(mSlot + 1, inState & S ? LED_ON : inState & C ? LED_ON : LED_OFF);    /* rouge */
     message.setLED(mSlot + 2, inState & Vl ? LED_ON : LED_OFF);   /* vert  */
     message.setLED(mSlot + 3, inState & C ? LED_ON : LED_OFF);    /* rouge2 */
-    message.setLED(mSlot + 4, inState & C ? LED_OFF : LED_ON); /* oeilleton */
+    message.setLED(mSlot + 4, inState & C ? LED_OFF : inState ? LED_ON : LED_OFF); /* oeilleton */
   }
 }
 
@@ -293,6 +293,6 @@ void CarreRappelRalentissementSignalWrapper::setState(const uint16_t inState)
     message.setLED(mSlot + 3, inState & C ? LED_ON : LED_OFF);  /* rouge2 */
     message.setLED(mSlot + 4, inState & RR ? LED_ON : inState & RRc ? LED_BLINK : LED_OFF);  /* jaune2 */
     message.setLED(mSlot + 5, inState & RR ? LED_ON : inState & RRc ? LED_BLINK : LED_OFF);  /* jaune3 */
-    message.setLED(mSlot + 6, inState & C ? LED_OFF : LED_ON); /* oeilleton */
+    message.setLED(mSlot + 6, inState & C ? LED_OFF : inState ? LED_ON : LED_OFF); /* oeilleton */
   }
 }
