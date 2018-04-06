@@ -7,8 +7,13 @@
  */
 
 #include "AbstractCANMessage.h"
+#include "mcp_can.h"
 
 static const uint8_t NUMBER_OF_LED = 9;
+static const uint32_t OUT_SATELLITE_MESSAGE_TYPE = 4;
+static const uint32_t NUMBER_OF_BITS_FOR_SATELLITE_ID = 3;
+
+extern MCP_CAN canController;
 
 AbstractCANOutSatelliteMessage::AbstractCANOutSatelliteMessage() :
   mSatelliteId(NO_SATELLITE_ID)
@@ -56,4 +61,11 @@ void AbstractCANOutSatelliteMessage::print()
   Serial.print('<');
   Serial.print(mData[2] & 0x80 ? '/' : '|');
   Serial.print('>');
+}
+
+void AbstractCANOutSatelliteMessage::send()
+{
+  uint32_t frameId =
+    (OUT_SATELLITE_MESSAGE_TYPE << NUMBER_OF_BITS_FOR_SATELLITE_ID) | mSatelliteId;
+  canController.sendMsgBuf(frameId, 0, 3, mData);
 }

@@ -1,9 +1,18 @@
+
 /*
  * Locoduinodrome
  */
+#include <mcp_can.h>
+#include <mcp_can_dfs.h>
  
 #include "SatelliteWrapper.h"
 #include "Feux.h"
+
+/*
+ * Interface CAN
+ */
+const uint8_t spiCS = 9;
+MCP_CAN canController(spiCS);
 
 /*
  *  Les aiguillages

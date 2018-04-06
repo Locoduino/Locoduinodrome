@@ -31,9 +31,7 @@ void sendSatelliteMessage()
   if (millis() > sendDate) {
     sendDate += OUT_MESSAGE_PERIOD;
 
-    uint32_t frameId =
-      (OUT_SATELLITE_MESSAGE_TYPE << NUMBER_OF_BITS_FOR_SATELLITE_ID) |
-      outSatellitesMessages[messageIndex].satelliteId();
+    outSatellitesMessages[messageIndex].send();
     
     /* passe au message suivant */
     messageIndex++;

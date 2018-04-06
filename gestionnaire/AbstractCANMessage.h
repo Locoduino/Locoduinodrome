@@ -32,7 +32,7 @@ public:
   void reserve(const uint8_t inSatelliteId) { mSatelliteId = inSatelliteId; }
   void print();
   void println() { print(); Serial.println(); }
-  void sendMessage();
+  void send();
 };
 
 #endif
