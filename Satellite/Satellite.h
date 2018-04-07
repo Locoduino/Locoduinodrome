@@ -30,8 +30,8 @@
 #endif
 #endif
 
-#include "Arduino.h"
-#include "EEPROM.h"
+#include <Arduino.h>
+#include <EEPROM.h>
 
 #include "Objet.h"
 
@@ -61,7 +61,7 @@ class Satellite
 	// Identifiant du satellite
 	uint8_t		id;
 
-	// Liste de tous les objets gérés
+	// Liste de tous les objets gï¿½rï¿½s
 	Objet*		objets[NB_LEDS + NB_AIGUILLES + NB_ZONES + NB_BALISES];
 	uint8_t		nbObjets;
 
@@ -78,14 +78,14 @@ class Satellite
 	{
 		int addr = 0;
 
-		////////////////////////////////////// Partie entête
+		////////////////////////////////////// Partie entï¿½te
 
-		/* Un descripteur du contenu est sauvé en premier.
-		Si ce descripteur n'est pas conforme à la lecture, alors l'EEPROM est considérée vierge.
+		/* Un descripteur du contenu est sauvï¿½ en premier.
+		Si ce descripteur n'est pas conforme ï¿½ la lecture, alors l'EEPROM sera considï¿½rï¿½e vierge.
 		Ca signifie aussi que changer la forme (nombre d'objets, taille d'un objet) annule toute sauvegarde !
 		*/
 
-		EEPROM.put(addr, (void *) EEPROM_ID, 4);
+    eeprom_write_block(EEPROM_ID, (void *)addr, 4);
 		addr += 4;
 
 		EEPROM.write(addr++, this->nbObjets);
@@ -103,21 +103,18 @@ class Satellite
 
 		for (int i = 0; i < this->nbObjets; i++)
 			addr = objets[i]->EEPROM_sauvegarde(addr);
-
-		//EEPROM.write(addr++, lowByte(tailles));
-		//EEPROM.write(addr++, highByte(tailles));
 	}
 
-	/* Chargement de la configuration depuis l'EEPROM. La fonction retourne true si tout est bien chargé. */
+	/* Chargement de la configuration depuis l'EEPROM. La fonction retourne true si tout est bien chargï¿½. */
 	bool EEPROM_chargement()
 	{
 		int addr = 0;
 		char buf[5];
 
-		////////////////////////////////////// Partie entête
+		////////////////////////////////////// Partie entï¿½te
 
 		// ID EEPROM
-		EEPROM.get(addr, buf, 4);
+    eeprom_read_block(buf, (const void *)addr, 4);
 		addr += 4;
 		buf[4] = 0;
 
@@ -131,7 +128,7 @@ class Satellite
 			return false;
 
 		// taille des objets
-		EEPROM.get(addr, buf, 4);
+    eeprom_read_block(buf, (const void *)addr, 4);
 		addr += 4;
 
 		if (buf[0] != leds[0].GetEEPROMSize())	return false;
