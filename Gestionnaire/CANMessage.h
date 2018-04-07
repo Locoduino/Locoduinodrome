@@ -13,10 +13,6 @@
 
 const uint8_t NO_SATELLITE_ID = 255;
 
-static const uint8_t LED_OFF = 0x0;
-static const uint8_t LED_BLINK = 0x1;
-static const uint8_t LED_ON = 0x2;
-
 class AbstractCANOutSatelliteMessage
 {
 private:

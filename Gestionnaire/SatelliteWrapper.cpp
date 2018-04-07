@@ -11,7 +11,7 @@
 
 #include "SatelliteConfig.h"
 #include "SatelliteWrapper.h"
-#include "AbstractCANMessage.h"
+#include "CANMessage.h"
 #include "Feux.h"
 
 /*

@@ -12,7 +12,7 @@
 #ifndef __SATELLITE_WRAPPER_H__
 #define __SATELLITE_WRAPPER_H__
 
-#include "Arduino.h"
+#include <stdint.h>
 
 /* Send the current satellite message */
 void sendSatelliteMessage();

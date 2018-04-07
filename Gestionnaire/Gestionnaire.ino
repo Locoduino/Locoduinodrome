@@ -47,13 +47,16 @@ void setup()
 
   printOutBuffers();
 
-  SignalWrapper::setSignalState(0, Vl);
+  SignalWrapper::setSignalState(6, Vl);
 
   printOutBuffers();
   
+  SignalWrapper::setSignalState(6, E);
+
+  printOutBuffers();
 }
 
 void loop()
 {
-
+  sendSatelliteMessage();
 }

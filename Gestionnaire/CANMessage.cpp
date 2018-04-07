@@ -6,12 +6,9 @@
  * Classe pour les messages CAN
  */
 
-#include "AbstractCANMessage.h"
+#include "SatelliteConfig.h"
+#include "CANMessage.h"
 #include "mcp_can.h"
-
-static const uint8_t NUMBER_OF_LED = 9;
-static const uint32_t OUT_SATELLITE_MESSAGE_TYPE = 4;
-static const uint32_t NUMBER_OF_BITS_FOR_SATELLITE_ID = 3;
 
 extern MCP_CAN canController;
 
