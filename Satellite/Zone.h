@@ -18,7 +18,7 @@ public:
 	Zone();
 
 	void begin(uint8_t inPin);
-	void loop();
+	void loop(uint8_t inNewState);
 
 	bool EstOccupee() { return this->occupee; }
 

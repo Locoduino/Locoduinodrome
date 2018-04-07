@@ -16,7 +16,7 @@ public:
 	bool IsValid() { return this->pin != 255; }
 
 	virtual void begin(uint8_t inPin) = 0;
-	virtual void loop() = 0;
+	virtual void loop(uint8_t inNewState) = 0;
 
 	virtual uint8_t GetEEPROMSize() { return 0;	}
 

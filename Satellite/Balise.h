@@ -18,7 +18,7 @@ public:
 	Balise();
 
 	void begin(uint8_t inPin);
-	void loop();
+	void loop(uint8_t inNewState);
 
 	bool EstActivee() {	return this->activee; }
 

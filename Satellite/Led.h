@@ -19,7 +19,7 @@ public:
 	Led();
 
 	void begin(uint8_t inPin);
-	void loop();
+	void loop(uint8_t inNewState);
 	
 	uint8_t GetEEPROMSize() { return Objet::GetEEPROMSize() + sizeof(unsigned int) + (2 * sizeof(unsigned long)); }
 	uint8_t EEPROM_chargement(int inAddr);

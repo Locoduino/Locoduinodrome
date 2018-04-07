@@ -40,7 +40,7 @@
 #include "Led.h"
 #include "Zone.h"
 
-#include "Bus.h"
+#include "CANMessage.h"
 
 #define LONGUEUR_ETAT	3
 
@@ -85,7 +85,7 @@ class Satellite
 		Ca signifie aussi que changer la forme (nombre d'objets, taille d'un objet) annule toute sauvegarde !
 		*/
 
-    eeprom_write_block(EEPROM_ID, (void *)addr, 4);
+		eeprom_write_block(EEPROM_ID, (void *)addr, 4);
 		addr += 4;
 
 		EEPROM.write(addr++, this->nbObjets);
@@ -114,7 +114,7 @@ class Satellite
 		////////////////////////////////////// Partie ent�te
 
 		// ID EEPROM
-    eeprom_read_block(buf, (const void *)addr, 4);
+		eeprom_read_block(buf, (const void *)addr, 4);
 		addr += 4;
 		buf[4] = 0;
 
@@ -128,7 +128,7 @@ class Satellite
 			return false;
 
 		// taille des objets
-    eeprom_read_block(buf, (const void *)addr, 4);
+		eeprom_read_block(buf, (const void *)addr, 4);
 		addr += 4;
 
 		if (buf[0] != leds[0].GetEEPROMSize())	return false;
@@ -149,13 +149,14 @@ class Satellite
 	}
 
 public:
-
-	uint8_t		etat[LONGUEUR_ETAT];
+	CommandCANMessage Message;
 
 	Led			leds[NB_LEDS];
 	Aiguille	aiguilles[NB_AIGUILLES];
 	Zone		zones[NB_ZONES];
 	Balise		balises[NB_BALISES];
+
+
 
 	Satellite()
 	{
