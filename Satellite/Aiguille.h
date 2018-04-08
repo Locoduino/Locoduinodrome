@@ -23,7 +23,7 @@ public:
 
 	void begin(uint8_t inPin);
 	void loop(uint8_t inNewState);
-	void loopPrioritaire() { SlowMotionServo::update(); }
+	static void loopPrioritaire() { SlowMotionServo::update(); }
 
 	uint8_t GetEEPROMSize()	{ return Objet::GetEEPROMSize() + (2 * sizeof(unsigned int)) + sizeof(float); }
 	uint8_t EEPROM_chargement(int inAddr);

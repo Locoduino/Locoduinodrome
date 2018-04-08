@@ -6,15 +6,19 @@
 
 Detecteur::Detecteur()
 {
-	this->intervalle = 500;
+	this->intervalle = 300;
+	this->remanence = 2000;
+	this->etatDetecte = HIGH;
+
 	this->precedentTest = 0;
+	this->perteDetection = 0;
 }
 
 void Detecteur::begin(uint8_t inPin)
 {
 	this->pin = inPin;
 	pinMode(this->pin, INPUT);
-	this->estDetecte = digitalRead(this->pin) == 1;
+	this->estDetecte = digitalRead(this->pin) == this->etatDetecte;
 }
 
 void Detecteur::loop(uint8_t inNewState)
@@ -22,13 +26,31 @@ void Detecteur::loop(uint8_t inNewState)
 	if (millis() - this->precedentTest < this->intervalle)
 		return;
 
-	bool activ = digitalRead(this->pin) == 1;
-	if (activ != this->estDetecte)
+	this->precedentTest = millis();
+	int etat = digitalRead(this->pin);
+
+	bool activ = etat == this->etatDetecte;
+
+	if (!activ && activ != this->estDetecte)
 	{
-		this->estDetecte = activ;
+		if (this->perteDetection == 0)
+		{
+			this->perteDetection = millis();
+			return;
+		}
+
+		if (millis() - this->perteDetection < this->remanence)
+			return;
+
+		this->perteDetection = 0;
 	}
 
-	this->precedentTest = millis();
+	if (activ)
+		Serial.println(F("Detecté"));
+	else
+		Serial.println(F("Fin Detection"));
+
+	this->estDetecte = activ;
 }
 
 uint8_t Detecteur::EEPROM_chargement(int inAddr)
@@ -37,6 +59,11 @@ uint8_t Detecteur::EEPROM_chargement(int inAddr)
 
 	EEPROMGET(addr, this->intervalle, sizeof(unsigned long));
 	addr += sizeof(unsigned long);
+	EEPROMGET(addr, this->remanence, sizeof(unsigned long));
+	addr += sizeof(unsigned long);
+	EEPROMGET(addr, this->etatDetecte, sizeof(byte));
+	addr += sizeof(byte);
+
 	return addr;
 }
 
@@ -46,6 +73,10 @@ uint8_t Detecteur::EEPROM_sauvegarde(int inAddr)
 
 	EEPROMPUT(addr, this->intervalle, sizeof(unsigned long));
 	addr += sizeof(unsigned long);
+	EEPROMPUT(addr, this->remanence, sizeof(unsigned long));
+	addr += sizeof(unsigned long);
+	EEPROMPUT(addr, this->etatDetecte, sizeof(byte));
+	addr += sizeof(byte);
 
 	return addr;
 }

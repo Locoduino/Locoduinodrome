@@ -16,11 +16,11 @@ void Aiguille::begin(uint8_t inPin)
 {
 	this->pin = inPin;	// inutile puisque stockée dans ServoMoteur, mais puisque Objet le permet...
 
-	Servomoteur.setMin(this->posDroit); // il faudra �talonner cette valeur min
-	Servomoteur.setMax(this->posDeviee); // il faudra �talonner cette valeur max
+	Servomoteur.setMin(this->posDroit); // il faudra étalonner cette valeur min
+	Servomoteur.setMax(this->posDeviee); // il faudra étalonner cette valeur max
 	Servomoteur.setSpeed(this->vitesse);
 	Servomoteur.setReverted(true);
-	Servomoteur.setInitialPosition(this->estDroit ? 0.0 : 1.0);
+	Servomoteur.setInitialPosition(this->estDroit ? 0.0f : 1.0f);
 	Servomoteur.setPin(this->pin);
 }
 
@@ -44,8 +44,8 @@ uint8_t Aiguille::EEPROM_chargement(int inAddr)
 	EEPROMGET(addr, this->vitesse, sizeof(float));
 	addr += sizeof(float);
 
-	Servomoteur.setMin(this->posDroit); // il faudra �talonner cette valeur min
-	Servomoteur.setMax(this->posDeviee); // il faudra �talonner cette valeur max
+	Servomoteur.setMin(this->posDroit); // il faudra étalonner cette valeur min
+	Servomoteur.setMax(this->posDeviee); // il faudra étalonner cette valeur max
 	Servomoteur.setSpeed(this->vitesse);
 	return addr;
 }

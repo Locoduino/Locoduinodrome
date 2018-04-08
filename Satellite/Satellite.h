@@ -100,7 +100,8 @@ class Satellite
 		////////////////////////////////////// Partie objets
 
 		for (int i = 0; i < this->nbObjets; i++)
-			addr = objets[i]->EEPROM_sauvegarde(addr);
+			if (objets[i] != NULL)
+				addr = objets[i]->EEPROM_sauvegarde(addr);
 	}
 
 	/* Chargement de la configuration depuis l'EEPROM. La fonction retourne true si tout est bien charg�. */
@@ -140,7 +141,8 @@ class Satellite
 		////////////////////////////////////// Partie objets
 
 		for (int i = 0; i < this->nbObjets; i++)
-			addr = objets[i]->EEPROM_chargement(addr);
+			if (objets[i] != NULL)
+				addr = objets[i]->EEPROM_chargement(addr);
 
 		return true;
 	}
@@ -167,25 +169,29 @@ public:
 		for (int i = 0; i < NB_AIGUILLES; i++)	this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
 		for (int i = 0; i < NB_DETECTEURS; i++)	this->AddObjet(&this->detecteurs[i], detecteurs_pins[i]);
 
-		if (EEPROM_chargement() == false)
-			EEPROM_sauvegarde();
+		/*if (EEPROM_chargement() == false)
+			EEPROM_sauvegarde();*/
 	}
 
 	void loop()
 	{
 		// traite les loop prioritaires
-		for (int i = 0; i < this->nbObjets; i++)
-			objets[i]->loopPrioritaire();
+		Aiguille::loopPrioritaire();
+		Detecteur::loopPrioritaire();
+		Led::loopPrioritaire();
 
-		// fait juste le loop de l'objet courant
-		uint8_t etat = 0;
+		if (objets[this->objetCourantLoop] != NULL)
+		{
+			// fait juste le loop de l'objet courant
+			uint8_t etat = 0;
 
-		if (this->objetCourantLoop < NB_LEDS)
-			etat = Message.ledState(this->objetCourantLoop);
-		else
-			if (this->objetCourantLoop < NB_LEDS + NB_AIGUILLES)
-				etat = Message.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
-		objets[this->objetCourantLoop]->loop(etat);
+			if (this->objetCourantLoop < NB_LEDS)
+				etat = Message.ledState(this->objetCourantLoop);
+			else
+				if (this->objetCourantLoop < NB_LEDS + NB_AIGUILLES)
+					etat = Message.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
+			objets[this->objetCourantLoop]->loop(etat);
+		}
 
 		// puis passe à l'objet suivant pour le prochain loop...
 		this->objetCourantLoop++;
