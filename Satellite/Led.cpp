@@ -3,6 +3,7 @@
 
 #include "Objet.h"
 #include "Led.h"
+#include "Messaging.h"
 
 Led::Led()
 {
@@ -19,24 +20,22 @@ void Led::begin(uint8_t inPin)
 
 void Led::loop(uint8_t inNewState)
 {
-	LightDimmer::update();
-
-/*	if (_state == CLIGNOTANTE && this->dimmer.off())
+	if (inNewState == LED_BLINK && this->dimmer.isOff())
 	{
 		this->dimmer.startBlink();
 		this->dimmer.on();
 	}
 
-	if (_state == ALLUMEE && this->dimmer.isOff())
+	if (inNewState == LED_ON && this->dimmer.isOff())
 	{
 		this->dimmer.stopBlink();
 		this->dimmer.on();
 	}
 
-	if (_state != ALLUMEE && this->dimmer.isOn())
+	if (inNewState == LED_OFF && this->dimmer.isOn())
 	{
 		this->dimmer.off();
-	}*/
+	}
 }
 	
 uint8_t Led::EEPROM_chargement(int inAddr)

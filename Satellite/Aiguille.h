@@ -16,6 +16,7 @@ class Aiguille : public Objet
 
 	// Gestion locale
 	SMSSmoothBounce Servomoteur;
+	bool estDroit;
 	
 public:
 	Aiguille();
