@@ -17,6 +17,7 @@ public:
 
 	virtual void begin(uint8_t inPin) = 0;
 	virtual void loop(uint8_t inNewState) = 0;
+	virtual void loopPrioritaire() {}
 
 	virtual uint8_t GetEEPROMSize() { return 0;	}
 

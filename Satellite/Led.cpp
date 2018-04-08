@@ -21,7 +21,7 @@ void Led::loop(uint8_t inNewState)
 {
 	LightDimmer::update();
 
-	if (_state == CLIGNOTANTE && this->dimmer.off())
+/*	if (_state == CLIGNOTANTE && this->dimmer.off())
 	{
 		this->dimmer.startBlink();
 		this->dimmer.on();
@@ -36,7 +36,7 @@ void Led::loop(uint8_t inNewState)
 	if (_state != ALLUMEE && this->dimmer.isOn())
 	{
 		this->dimmer.off();
-	}
+	}*/
 }
 	
 uint8_t Led::EEPROM_chargement(int inAddr)

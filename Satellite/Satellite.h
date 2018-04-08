@@ -36,9 +36,8 @@
 #include "Objet.h"
 
 #include "Aiguille.h"
-#include "Balise.h"
+#include "Detecteur.h"
 #include "Led.h"
-#include "Zone.h"
 
 #include "CANMessage.h"
 
@@ -46,32 +45,32 @@
 
 #define NB_LEDS			9
 #define NB_AIGUILLES	1
-#define NB_ZONES		1
-#define NB_BALISES		2
+#define NB_DETECTEURS	3
 
 const uint8_t leds_pins[] = { 3, 4, 5, 6, 7, 8, 9, A0, A1 };
 const uint8_t aiguilles_pins[] = { A2 };
-const uint8_t zones_pins[] = { A5 };
-const uint8_t balises_pins[] = { A3, A4 };
+const uint8_t detecteurs_pins[] = { A3, A4, A5 };
 
 const char *EEPROM_ID = { "LCDO" };
 
 class Satellite
 {
-	// Identifiant du satellite
-	uint8_t		id;
+	// Configuration
+	uint8_t		id;	// Identifiant du satellite
 
-	// Liste de tous les objets g�r�s
-	Objet*		objets[NB_LEDS + NB_AIGUILLES + NB_ZONES + NB_BALISES];
+	// Gestion locale	
+	Objet*		objets[NB_LEDS + NB_AIGUILLES + NB_DETECTEURS];	// Liste de tous les objets gérés
 	uint8_t		nbObjets;
+	byte		objetCourantLoop;
 
 	void AddObjet(Objet *inpObjet, uint8_t inPin)
 	{
 		if (inpObjet != NULL && inPin != 255)
 		{
 			inpObjet->begin(inPin);
-			this->objets[this->nbObjets++] = inpObjet;
+			this->objets[this->nbObjets] = inpObjet;
 		}
+		this->nbObjets++;
 	}
 
 	void EEPROM_sauvegarde()
@@ -92,8 +91,7 @@ class Satellite
 
 		EEPROM.write(addr++, leds[0].GetEEPROMSize());
 		EEPROM.write(addr++, aiguilles[0].GetEEPROMSize());
-		EEPROM.write(addr++, balises[0].GetEEPROMSize());
-		EEPROM.write(addr++, zones[0].GetEEPROMSize());
+		EEPROM.write(addr++, detecteurs[0].GetEEPROMSize());
 
 		////////////////////////////////////// Partie satellite
 
@@ -128,13 +126,12 @@ class Satellite
 			return false;
 
 		// taille des objets
-		eeprom_read_block(buf, (const void *)addr, 4);
-		addr += 4;
+		eeprom_read_block(buf, (const void *)addr, 3);
+		addr += 3;
 
 		if (buf[0] != leds[0].GetEEPROMSize())	return false;
 		if (buf[1] != aiguilles[0].GetEEPROMSize())	return false;
-		if (buf[2] != balises[0].GetEEPROMSize())	return false;
-		if (buf[3] != zones[0].GetEEPROMSize())	return false;
+		if (buf[2] != detecteurs[0].GetEEPROMSize())	return false;
 
 		////////////////////////////////////// Partie satellite
 
@@ -153,16 +150,14 @@ public:
 
 	Led			leds[NB_LEDS];
 	Aiguille	aiguilles[NB_AIGUILLES];
-	Zone		zones[NB_ZONES];
-	Balise		balises[NB_BALISES];
+	Detecteur	detecteurs[NB_DETECTEURS];
 
-
-
-	Satellite()
+ 	Satellite()
 	{
 		this->nbObjets = 0;
-		for (int i = 0; i < NB_LEDS + NB_AIGUILLES + NB_ZONES + NB_BALISES; i++)
+		for (int i = 0; i < NB_LEDS + NB_AIGUILLES + NB_DETECTEURS; i++)
 			objets[i] = NULL;
+		this->objetCourantLoop = 0;
 	}
 
 	void begin()
@@ -170,8 +165,7 @@ public:
 		this->nbObjets = 0;
 		for (int i = 0; i < NB_LEDS; i++)		this->AddObjet(&this->leds[i], leds_pins[i]);
 		for (int i = 0; i < NB_AIGUILLES; i++)	this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
-		for (int i = 0; i < NB_BALISES; i++)	this->AddObjet(&this->balises[i], balises_pins[i]);
-		for (int i = 0; i < NB_ZONES; i++)		this->AddObjet(&this->zones[i], zones_pins[i]);
+		for (int i = 0; i < NB_DETECTEURS; i++)	this->AddObjet(&this->detecteurs[i], detecteurs_pins[i]);
 
 		if (EEPROM_chargement() == false)
 			EEPROM_sauvegarde();
@@ -179,7 +173,25 @@ public:
 
 	void loop()
 	{
+		// traite les loop prioritaires
 		for (int i = 0; i < this->nbObjets; i++)
-			objets[i]->loop();
+			objets[i]->loopPrioritaire();
+
+		// fait juste le loop de l'objet courant
+		uint8_t etat = 0;
+
+		if (this->objetCourantLoop < NB_LEDS)
+			etat = Message.ledState(this->objetCourantLoop);
+		else
+			if (this->objetCourantLoop < NB_LEDS + NB_AIGUILLES)
+				etat = Message.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
+		objets[this->objetCourantLoop]->loop(etat);
+
+		// puis passe à l'objet suivant pour le prochain loop...
+		this->objetCourantLoop++;
+
+		// Si on est à la fin de la liste, on recommence !
+		if (this->objetCourantLoop >= this->nbObjets)
+			this->objetCourantLoop = 0;
 	}
 };

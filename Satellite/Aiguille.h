@@ -9,10 +9,12 @@
 */
 class Aiguille : public Objet
 {
+	// Configuration
 	unsigned int posDroit;
 	unsigned int posDeviee;
 	float vitesse;
 
+	// Gestion locale
 	SMSSmoothBounce Servomoteur;
 	
 public:
@@ -20,6 +22,7 @@ public:
 
 	void begin(uint8_t inPin);
 	void loop(uint8_t inNewState);
+	void loopPrioritaire() { SlowMotionServo::update(); }
 
 	uint8_t GetEEPROMSize()	{ return Objet::GetEEPROMSize() + (2 * sizeof(unsigned int)) + sizeof(float); }
 	uint8_t EEPROM_chargement(int inAddr);

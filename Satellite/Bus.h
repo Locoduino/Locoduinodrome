@@ -1,9 +1,15 @@
+//-------------------------------------------------------------------
+#ifndef __bus_H__
+#define __bus_H__
+//-------------------------------------------------------------------
 
 // gestion du bus (Can)
 
+#ifndef VISUALSTUDIO
+
 /////////////////////////////////////////////////////////////////////////////
 #include <Arduino.h>
-/*#include <SPI.h>      //  SPI library
+#include <SPI.h>      //  SPI library
 #include <mcp_can.h>  // MCP2515 library
 
 // CAN parameters
@@ -18,7 +24,6 @@ const int RETRY_CONNECTION = 10;        // retry connection
 MCP_CAN can(CS);                        // CAN instance
 
 volatile bool FlagReceive = false;      // can interrupt flag
-*/
 
 // message CAN information
 
@@ -29,17 +34,17 @@ unsigned char RxBuf[8];         // buffer of data : byte1 : code, byte2 : numero
 unsigned long CanTx;
 unsigned char TxLen = 0;        // length of data, 3 octets by message
 unsigned char TxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
-/*
+
 
 // CAN interrupt routine
 
 void MCP2515_ISR() {FlagReceive = true;}
 
-*/
+
 // initialisation du bus
 void busInit() // init CAN
 {
-/*  int repeat = RETRY_CONNECTION;                              // try to open the CAN
+  int repeat = RETRY_CONNECTION;                              // try to open the CAN
   while (repeat > 0) 
   {
     if (CAN_OK == can.begin(Id_Mode, baudrate, speedset)){break;}
@@ -52,7 +57,7 @@ void busInit() // init CAN
    /*
    * set mask & filters
    */
-/*  can.init_Mask(0, 0, 0x3F0);               // there are 2 mask in mcp2515, you need to set both of them
+  can.init_Mask(0, 0, 0x3F0);               // there are 2 mask in mcp2515, you need to set both of them
   can.init_Mask(1, 0, 0x3F0);               // mode standard (0) et Id = pole
    
   can.init_Filt(0, 0, 0x10);                // Reception possible : Id 10 (hex)
@@ -62,13 +67,13 @@ void busInit() // init CAN
   can.init_Filt(4, 0, 0x14);                // Reception possible : Id 14 (hex)
   can.init_Filt(5, 0, 0x15);                // Reception possible : Id 15 (hex)
 
-  CanTx = dip;*/
+  CanTx = dip;
 }
 
 // envoi de message sur le bus (CAN)
 void messageTx(byte code,byte numero,byte info) 
 {
-/*  TxBuf[0] = code;
+  TxBuf[0] = code;
   TxBuf[1] = numero;
   TxBuf[2] = info;
 
@@ -78,7 +83,6 @@ void messageTx(byte code,byte numero,byte info)
       //Serial.println("Message Sent Successfully!");
     //else
       //Serial.println("Error Sending Message...");
- */ 
 }
 
 // test et lecture message sur bus (CAN) = non utilisé => voir loop
@@ -90,4 +94,5 @@ boolean messageRx(byte* code,byte* numero,byte* info) {
 } 
 
 /////////////////////////////////////////////////////////////////////////////
-
+#endif
+#endif

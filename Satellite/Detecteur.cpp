@@ -2,36 +2,36 @@
 #include <EEPROM.h>
 
 #include "Objet.h"
-#include "Balise.h"
+#include "Detecteur.h"
 
-Balise::Balise()
+Detecteur::Detecteur()
 {
 	this->intervalle = 500;
 	this->precedentTest = 0;
 }
 
-void Balise::begin(uint8_t inPin)
+void Detecteur::begin(uint8_t inPin)
 {
 	this->pin = inPin;
 	pinMode(this->pin, INPUT);
-	this->activee = digitalRead(this->pin) == 1;
+	this->estDetecte = digitalRead(this->pin) == 1;
 }
 
-void Balise::loop(uint8_t inNewState)
+void Detecteur::loop(uint8_t inNewState)
 {
 	if (millis() - this->precedentTest < this->intervalle)
 		return;
 
 	bool activ = digitalRead(this->pin) == 1;
-	if (activ != this->activee)
+	if (activ != this->estDetecte)
 	{
-		this->activee = activ;
+		this->estDetecte = activ;
 	}
 
 	this->precedentTest = millis();
 }
 
-uint8_t Balise::EEPROM_chargement(int inAddr)
+uint8_t Detecteur::EEPROM_chargement(int inAddr)
 {
 	int addr = Objet::EEPROM_chargement(inAddr);
 
@@ -40,7 +40,7 @@ uint8_t Balise::EEPROM_chargement(int inAddr)
 	return addr;
 }
 
-uint8_t Balise::EEPROM_sauvegarde(int inAddr)
+uint8_t Detecteur::EEPROM_sauvegarde(int inAddr)
 {
 	int addr = Objet::EEPROM_sauvegarde(inAddr);
 
