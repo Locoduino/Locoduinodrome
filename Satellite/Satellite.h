@@ -148,11 +148,11 @@ class Satellite
 	}
 
 public:
-	CommandCANMessage Message;
-
 	Led			leds[NB_LEDS];
 	Aiguille	aiguilles[NB_AIGUILLES];
 	Detecteur	detecteurs[NB_DETECTEURS];
+
+	CommandCANMessage Message;
 
  	Satellite()
 	{
@@ -164,6 +164,8 @@ public:
 
 	void begin()
 	{
+		busInit(this->id);
+
 		this->nbObjets = 0;
 		for (int i = 0; i < NB_LEDS; i++)		this->AddObjet(&this->leds[i], leds_pins[i]);
 		for (int i = 0; i < NB_AIGUILLES; i++)	this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
@@ -175,6 +177,8 @@ public:
 
 	void loop()
 	{
+		messageRx();
+
 		// traite les loop prioritaires
 		Aiguille::loopPrioritaire();
 		Detecteur::loopPrioritaire();
@@ -186,10 +190,10 @@ public:
 			uint8_t etat = 0;
 
 			if (this->objetCourantLoop < NB_LEDS)
-				etat = Message.ledState(this->objetCourantLoop);
+				etat = this->Message.ledState(this->objetCourantLoop);
 			else
 				if (this->objetCourantLoop < NB_LEDS + NB_AIGUILLES)
-					etat = Message.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
+					etat = this->Message.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
 			objets[this->objetCourantLoop]->loop(etat);
 		}
 

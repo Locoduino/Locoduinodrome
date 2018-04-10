@@ -3,6 +3,7 @@
 // Copyright Locoduino 2018
 // Version 0.0
 
+#include "Bus.h"
 #include "Satellite.h"
 
 Satellite sat;
@@ -41,6 +42,8 @@ void satelliteId(CommandInterpreter &cmdInt, byte argCount)
 	
 void setup()
 { 
+	Serial.begin(115200);
+
 	sat.begin();
 }
 
