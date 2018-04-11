@@ -10,12 +10,9 @@
 class Aiguille : public Objet
 {
 	// Configuration
-	unsigned int posDroit;
-	unsigned int posDeviee;
-	float vitesse;
 
 	// Gestion locale
-	SMSSmoothBounce Servomoteur;
+	SMSSmoothBounce servoMoteur;
 	bool estDroit;
 	
 public:

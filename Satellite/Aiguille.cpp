@@ -6,9 +6,6 @@
 
 Aiguille::Aiguille()
 {
-	this->posDroit = 800;
-	this->posDeviee = 2200;
-	this->vitesse = 1.5;
 	this->estDroit = true;
 }
 
@@ -16,12 +13,9 @@ void Aiguille::begin(uint8_t inPin)
 {
 	this->pin = inPin;	// inutile puisque stockée dans ServoMoteur, mais puisque Objet le permet...
 
-	Servomoteur.setMin(this->posDroit); // il faudra étalonner cette valeur min
-	Servomoteur.setMax(this->posDeviee); // il faudra étalonner cette valeur max
-	Servomoteur.setSpeed(this->vitesse);
-	Servomoteur.setReverted(true);
-	Servomoteur.setInitialPosition(this->estDroit ? 0.0f : 1.0f);
-	Servomoteur.setPin(this->pin);
+	servoMoteur.setReverted(true);
+	servoMoteur.setInitialPosition(this->estDroit ? 0.0f : 1.0f);
+	servoMoteur.setPin(this->pin);
 }
 
 void Aiguille::loop(uint8_t inEstDroit)
@@ -30,35 +24,41 @@ void Aiguille::loop(uint8_t inEstDroit)
 		return;
 
 	this->estDroit = (bool)inEstDroit;
-	this->Servomoteur.goTo(inEstDroit ? 0.0 : 1.0);
+	this->servoMoteur.goTo(inEstDroit ? 0.0f : 1.0f);
 }
 
 uint8_t Aiguille::EEPROM_chargement(int inAddr)
 {
 	int addr = Objet::EEPROM_chargement(inAddr);
+	unsigned int valeurUInt;
+	float valeurFloat;
 
-	EEPROMGET(addr, this->posDroit, sizeof(unsigned int));
+	valeurUInt = this->servoMoteur.minimumPulse();
+	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
 	addr += sizeof(unsigned int);
-	EEPROMGET(addr, this->posDeviee, sizeof(unsigned int));
+	valeurUInt = this->servoMoteur.maximumPulse();
+	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
 	addr += sizeof(unsigned int);
-	EEPROMGET(addr, this->vitesse, sizeof(float));
+	valeurFloat = this->servoMoteur.minToMaxSpeed() * 10000.f ;
+	EEPROMGET(addr, valeurFloat, sizeof(float));
 	addr += sizeof(float);
-
-	Servomoteur.setMin(this->posDroit); // il faudra étalonner cette valeur min
-	Servomoteur.setMax(this->posDeviee); // il faudra étalonner cette valeur max
-	Servomoteur.setSpeed(this->vitesse);
 	return addr;
 }
 
 uint8_t Aiguille::EEPROM_sauvegarde(int inAddr)
 {
 	int addr = Objet::EEPROM_sauvegarde(inAddr);
+	unsigned int valeurUInt;
+	float valeurFloat;
 
-	EEPROMPUT(addr, this->posDroit, sizeof(unsigned int));
+	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
+	this->servoMoteur.setMin(valeurUInt);
 	addr += sizeof(unsigned int);
-	EEPROMPUT(addr, this->posDeviee, sizeof(unsigned int));
+	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
+	this->servoMoteur.setMax(valeurUInt);
 	addr += sizeof(unsigned int);
-	EEPROMPUT(addr, this->vitesse, sizeof(float));
+	EEPROMPUT(addr, valeurFloat, sizeof(float));
+	this->servoMoteur.setSpeed(valeurFloat);
 	addr += sizeof(float);
 
 	return addr;
