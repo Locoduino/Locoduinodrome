@@ -16,12 +16,12 @@
 
 // CAN parameters
 
-const uint8_t CANInt = 3;                  // interrupt from CAN on pin 2 (int 0)
+const uint8_t CANInt = 2;                  // interrupt from CAN on pin 2 (int 0)
 const uint8_t canCS = 10;                     // 328P chip select for CAN
 
 MCP_CAN can(canCS);                        // CAN instance
 
-const int baudrate = CAN_250KBPS;       // can throughput 500 Kb/s  
+const int baudrate = CAN_500KBPS;       // can throughput 500 Kb/s  
 const int RETRY_CONNECTION = 10;        // retry connection
 
 volatile bool FlagReceive = false;      // can interrupt flag
@@ -45,47 +45,44 @@ void MCP2515_ISR() {FlagReceive = true;}
 // initialisation du bus
 void busInit(uint8_t id) // init CAN
 {
-  int repeat = RETRY_CONNECTION;                              // try to open the CAN
-  while (repeat > 0) 
-  {
-    if (CAN_OK == can.begin(baudrate)){break;}
-    else {repeat--;}
-    delay(500);
-  }
-  pinMode(CANInt,INPUT);                                       // CAN int pin
-  attachInterrupt(0,&MCP2515_ISR,FALLING);                     // CAN interrupt
+	int repeat = RETRY_CONNECTION;                              // try to open the CAN
+	while (repeat > 0)
+	{
+		if (CAN_OK == can.begin(baudrate)) { break; }
+		else { repeat--; }
+		delay(500);
+	}
+	pinMode(CANInt, INPUT);                                       // CAN int pin
+	attachInterrupt(0, MCP2515_ISR, FALLING);                     // CAN interrupt
 
-   /*
-   * set mask & filters
-   * frameId = 32 + mSatelliteId = (32, 33, 34, 35, 36, 37, 38, 39}
-   */
-  can.init_Mask(0, 0, 0x3F0);               // there are 2 mask in mcp2515, you need to set both of them
-  can.init_Mask(1, 0, 0x3F0);               // mode standard (0), 
-   
-  can.init_Filt(0, 0, 0x32+id);                // Reception possible : Id 32 (hex) + mSatelliteId
-  can.init_Filt(1, 0, 0x32+id);                // Reception possible : Id 32 (hex)
-  can.init_Filt(2, 0, 0x32+id);                // Reception possible : Id 32 (hex)
-  can.init_Filt(3, 0, 0x32+id);                // Reception possible : Id 32 (hex)
-  can.init_Filt(4, 0, 0x32+id);                // Reception possible : Id 32 (hex)
-  can.init_Filt(5, 0, 0x32+id);                // Reception possible : Id 32 (hex)
+	/*
+	* set mask & filters
+	* frameId = 32 + mSatelliteId = (32, 33, 34, 35, 36, 37, 38, 39}
+	*/
+	can.init_Mask(0, 0, 0x3F0);               // there are 2 mask in mcp2515, you need to set both of them
+	can.init_Mask(1, 0, 0x3F0);               // mode standard (0), 
 
-  CanTxId = 0x10 + id;
-  Serial.print("Can initialized with Id ");Serial.println(CanTxId);
+	can.init_Filt(0, 0, 0x20);                // Reception possible : Id 32 (hex) + mSatelliteId
+	can.init_Filt(1, 0, 0x21);                // Reception possible : Id 32 (hex)
+	can.init_Filt(2, 0, 0x22);                // Reception possible : Id 32 (hex)
+	can.init_Filt(3, 0, 0x23);                // Reception possible : Id 32 (hex)
+	can.init_Filt(4, 0, 0x24);                // Reception possible : Id 32 (hex)
+	can.init_Filt(5, 0, 0x25);                // Reception possible : Id 32 (hex)
+
+	CanTxId = 0x10 + id;
+	Serial.print("CAN initialise avec id "); Serial.println(CanTxId);
 }
 
 // envoi de message sur le bus (CAN)
 void messageTx() 
 {
-//  TxBuf[0] = code;
-//  TxBuf[1] = numero;
-//  TxBuf[2] = info;
-
   byte sndStat = can.sendMsgBuf(CanTxId, 0, 3, TxBuf);
-    
+ 
 }
 
-// test et lecture message sur bus (CAN) = non utilisé => voir loop
-boolean messageRx() { //messageRx
+// test et lecture message sur bus (CAN)
+boolean messageRx() 
+{
   if (FlagReceive) 
   {
     FlagReceive = false;   // if receive message from CAN bus

@@ -24,9 +24,9 @@
  * pin A7 (nu)
  */ 
  
-#if !defined ARDUINO_AVR_NANO && !defined ARDUINO_AVR_UNO
+#if !defined (__AVR_ATmega328P__)
 #if !defined VISUALSTUDIO
-  #error CANNOT COMPILE - ONLY WORKS WITH AN ARDUINO UNO, NANO
+  #error CANNOT COMPILE - ONLY WORKS WITH AN ARDUINO UNO, NANO OR MINI
 #endif
 #endif
 

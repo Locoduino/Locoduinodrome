@@ -46,7 +46,7 @@ void Detecteur::loop(uint8_t inNewState)
 	}
 
 	if (activ)
-		Serial.println(F("Detecté"));
+		Serial.println(F("Detecte"));
 	else
 		Serial.println(F("Fin Detection"));
 
