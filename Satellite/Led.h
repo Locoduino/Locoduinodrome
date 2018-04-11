@@ -9,11 +9,6 @@
 */
 class Led : public Objet
 {
-	// Configuration
-	unsigned int valeurPWM;
-	unsigned long clignotement;
-	unsigned long dimming;
-
 	// Gestion locale
 	LightDimmerSoft dimmer;
 
