@@ -7,9 +7,6 @@
 
 Led::Led()
 {
-	this->valeurPWM = 255;
-	this->clignotement = 500;
-	this->dimming = 250;
 }
 
 void Led::begin(uint8_t inPin)
@@ -41,26 +38,36 @@ void Led::loop(uint8_t inNewState)
 uint8_t Led::EEPROM_chargement(int inAddr)
 {
 	int addr = Objet::EEPROM_chargement(inAddr);
+	uint8_t valeur8;
+	uint16_t valeur16;
 
-	EEPROMGET(addr, this->valeurPWM, sizeof(unsigned int));
-	addr += sizeof(unsigned int);
-	EEPROMGET(addr, this->clignotement, sizeof(unsigned long));
-	addr += sizeof(unsigned long);
-	EEPROMGET(addr, this->dimming, sizeof(unsigned long));
-	addr += sizeof(unsigned long);
+	EEPROMGET(addr, valeur8, sizeof(uint8_t));
+	this->dimmer.setMax(valeur8);
+	addr += sizeof(uint8_t);
+	EEPROMGET(addr, valeur16, sizeof(uint16_t));
+	this->dimmer.setBrighteningTime(valeur16);
+	addr += sizeof(uint16_t);
+	EEPROMGET(addr, valeur16, sizeof(uint16_t));
+	this->dimmer.setFadingTime(valeur16);
+	addr += sizeof(uint16_t);
 	return addr;
 }
 
 uint8_t Led::EEPROM_sauvegarde(int inAddr)
 {
 	int addr = Objet::EEPROM_sauvegarde(inAddr);
+	uint8_t valeur8;
+	uint16_t valeur16;
 
-	EEPROMPUT(addr, this->valeurPWM, sizeof(unsigned int));
-	addr += sizeof(unsigned int);
-	EEPROMPUT(addr, this->clignotement, sizeof(unsigned long));
-	addr += sizeof(unsigned long);
-	EEPROMPUT(addr, this->dimming, sizeof(unsigned long));
-	addr += sizeof(unsigned long);
+	valeur8 = this->dimmer.maximum();
+	EEPROMPUT(addr, valeur8, sizeof(uint8_t));
+	addr += sizeof(uint8_t);
+	valeur16 = this->dimmer.brighteningTime();
+	EEPROMPUT(addr, valeur16, sizeof(uint16_t));
+	addr += sizeof(uint16_t);
+	valeur16 = this->dimmer.fadingTime();
+	EEPROMPUT(addr, valeur16, sizeof(uint16_t));
+	addr += sizeof(uint16_t);
 
 	return addr;
 }
