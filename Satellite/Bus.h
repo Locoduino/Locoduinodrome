@@ -96,9 +96,6 @@ boolean messageRx() { //messageRx
       Serial.print("Rid: ");Serial.print(CanRxId);
       if (RxLen == 3)
       {
-        // Copie le message vers le buffer partagé.
-        CommandCANMessage::Message.receive(RxBuf);
-
         Serial.print(" 0x");Serial.print(RxBuf[0], HEX);
         Serial.print(" 0x");Serial.print(RxBuf[1], HEX);
         Serial.print(" 0x");Serial.println(RxBuf[2], HEX);
@@ -116,6 +113,9 @@ boolean messageRx() { //messageRx
 
 /////////////////////////////////////////////////////////////////////////////
 #else
+unsigned char RxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
+unsigned char TxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
+
 void busInit(uint8_t id)
 {
 }

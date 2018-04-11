@@ -177,8 +177,9 @@ public:
 
 	void loop()
 	{
-		messageRx();
-
+		if (messageRx())
+			this->Message.receive(RxBuf);
+		
 		// traite les loop prioritaires
 		Aiguille::loopPrioritaire();
 		Detecteur::loopPrioritaire();
