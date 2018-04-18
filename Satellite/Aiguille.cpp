@@ -33,15 +33,16 @@ uint8_t Aiguille::EEPROM_chargement(int inAddr)
 	unsigned int valeurUInt;
 	float valeurFloat;
 
-	valeurUInt = this->servoMoteur.minimumPulse();
 	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
+	this->servoMoteur.setMin(valeurUInt);
 	addr += sizeof(unsigned int);
-	valeurUInt = this->servoMoteur.maximumPulse();
 	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
+	this->servoMoteur.setMax(valeurUInt);
 	addr += sizeof(unsigned int);
-	valeurFloat = this->servoMoteur.minToMaxSpeed() * 10000.f ;
 	EEPROMGET(addr, valeurFloat, sizeof(float));
+	this->servoMoteur.setSpeed(valeurFloat);
 	addr += sizeof(float);
+
 	return addr;
 }
 
@@ -51,14 +52,14 @@ uint8_t Aiguille::EEPROM_sauvegarde(int inAddr)
 	unsigned int valeurUInt;
 	float valeurFloat;
 
+	valeurUInt = this->servoMoteur.minimumPulse();
 	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
-	this->servoMoteur.setMin(valeurUInt);
 	addr += sizeof(unsigned int);
+	valeurUInt = this->servoMoteur.maximumPulse();
 	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
-	this->servoMoteur.setMax(valeurUInt);
 	addr += sizeof(unsigned int);
+	valeurFloat = this->servoMoteur.minToMaxSpeed() * 10000.f;
 	EEPROMPUT(addr, valeurFloat, sizeof(float));
-	this->servoMoteur.setSpeed(valeurFloat);
 	addr += sizeof(float);
 
 	return addr;
