@@ -24,6 +24,7 @@ public:
   uint8_t ledState(const uint8_t inLedNumber);
   bool pointState();
   void receive(uint8_t *inData);
+    void transmit(uint8_t *inData);
 };
 
 #endif /* __CAN_MESSAGE_H__ */

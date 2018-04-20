@@ -9,6 +9,7 @@ Detecteur::Detecteur()
 	this->intervalle = 300;
 	this->remanence = 2000;
 	this->etatDetecte = HIGH;
+  this->etatPrecedent = HIGH;
 
 	this->precedentTest = 0;
 	this->perteDetection = 0;
@@ -45,11 +46,15 @@ void Detecteur::loop(uint8_t inNewState)
 		this->perteDetection = 0;
 	}
 
-	if (activ)
-		Serial.println(F("Detecte"));
-	else
-		Serial.println(F("Fin Detection"));
-
+	if (activ != this->etatPrecedent) 
+  {
+    if (activ)
+		  Serial.println(F("Liberation"));
+	  else
+		  Serial.println(F("Occupation"));
+      
+  this->etatPrecedent = activ;
+  }
 	this->estDetecte = activ;
 }
 

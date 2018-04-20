@@ -53,6 +53,19 @@ const uint8_t detecteurs_pins[] = { A3, A4, A5 };
 
 const char *EEPROM_ID = { "LCDO" };
 
+/*
+ * Temporairement on peut fixer l'Id des satellites à la main !
+ */
+ 
+//#define ID_SAT        0 // carre 4
+//#define ID_SAT        1 // carre 5
+#define ID_SAT        2 // carre 7 et aiguille 1
+//#define ID_SAT        3 // semaphore 1 et semaphore RR 8
+//#define ID_SAT        4 // semaphore 0 et semaphore RR 9
+//#define ID_SAT        5 // carre RR 3
+//#define ID_SAT        6 // carre 6 et aiguille 0
+//#define ID_SAT        7 // carre RR 2
+
 class Satellite
 {
 	// Configuration
@@ -77,10 +90,10 @@ class Satellite
 	{
 		int addr = 0;
 
-		////////////////////////////////////// Partie ent�te
+		////////////////////////////////////// Partie entete
 
-		/* Un descripteur du contenu est sauv� en premier.
-		Si ce descripteur n'est pas conforme � la lecture, alors l'EEPROM sera consid�r�e vierge.
+		/* Un descripteur du contenu est sauve en premier.
+		Si ce descripteur n'est pas conforme a la lecture, alors l'EEPROM sera consideree vierge.
 		Ca signifie aussi que changer la forme (nombre d'objets, taille d'un objet) annule toute sauvegarde !
 		*/
 
@@ -110,7 +123,7 @@ class Satellite
 		int addr = 0;
 		char buf[5];
 
-		////////////////////////////////////// Partie ent�te
+		////////////////////////////////////// Partie entete
 
 		// ID EEPROM
 		eeprom_read_block(buf, (const void *)addr, 4);
@@ -164,10 +177,17 @@ public:
 
 	void begin()
 	{
+		this->id = ID_SAT;
 		busInit(this->id);
 
 		this->nbObjets = 0;
-		for (int i = 0; i < NB_LEDS; i++)		this->AddObjet(&this->leds[i], leds_pins[i]);
+		for (int i = 0; i < NB_LEDS; i++)
+		{
+		  this->AddObjet(&this->leds[i], leds_pins[i]);
+      digitalWrite(leds_pins[i], HIGH);
+      delay(250);
+      digitalWrite(leds_pins[i], LOW);
+		}
 		for (int i = 0; i < NB_AIGUILLES; i++)	this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
 		for (int i = 0; i < NB_DETECTEURS; i++)	this->AddObjet(&this->detecteurs[i], detecteurs_pins[i]);
 
@@ -178,7 +198,11 @@ public:
 	void loop()
 	{
 		if (messageRx())
-			this->Message.receive(RxBuf);
+    {
+			this->Message.receive(RxBuf); // synchronisation sur les réceptions periodiques
+      this->Message.transmit(TxBuf);// des emissions concernant les capteurs
+      messageTx();
+    }
 		
 		// traite les loop prioritaires
 		Aiguille::loopPrioritaire();

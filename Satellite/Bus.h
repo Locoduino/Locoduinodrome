@@ -45,6 +45,7 @@ void MCP2515_ISR() {FlagReceive = true;}
 // initialisation du bus
 void busInit(uint8_t id) // init CAN
 {
+	uint8_t canFilter = 0x20 + id;                              // messages recus = 0x20 + Id
 	int repeat = RETRY_CONNECTION;                              // try to open the CAN
 	while (repeat > 0)
 	{
@@ -59,18 +60,23 @@ void busInit(uint8_t id) // init CAN
 	* set mask & filters
 	* frameId = 32 + mSatelliteId = (32, 33, 34, 35, 36, 37, 38, 39}
 	*/
-	can.init_Mask(0, 0, 0x3F0);               // there are 2 mask in mcp2515, you need to set both of them
-	can.init_Mask(1, 0, 0x3F0);               // mode standard (0), 
+	can.init_Mask(0, 0, 0x3FF);               // there are 2 mask in mcp2515, you need to set both of them
+	can.init_Mask(1, 0, 0x3FF);               // mode standard (0), 
 
-	can.init_Filt(0, 0, 0x20);                // Reception possible : Id 32 (hex) + mSatelliteId
-	can.init_Filt(1, 0, 0x21);                // Reception possible : Id 32 (hex)
-	can.init_Filt(2, 0, 0x22);                // Reception possible : Id 32 (hex)
-	can.init_Filt(3, 0, 0x23);                // Reception possible : Id 32 (hex)
-	can.init_Filt(4, 0, 0x24);                // Reception possible : Id 32 (hex)
-	can.init_Filt(5, 0, 0x25);                // Reception possible : Id 32 (hex)
+	can.init_Filt(0, 0, canFilter);                // Reception possible : Id 32 (hex) + mSatelliteId
+	can.init_Filt(1, 0, canFilter);                // Reception possible : Id 32 (hex)
+	can.init_Filt(2, 0, canFilter);                // Reception possible : Id 32 (hex)
+	can.init_Filt(3, 0, canFilter);                // Reception possible : Id 32 (hex)
+	can.init_Filt(4, 0, canFilter);                // Reception possible : Id 32 (hex)
+	can.init_Filt(5, 0, canFilter);                // Reception possible : Id 32 (hex)
 
-	CanTxId = 0x10 + id;
+	CanTxId = 0x10 + id;                           // messages emis = 0x10 + Id
 	Serial.print("CAN initialise avec id "); Serial.println(CanTxId);
+
+  /*
+   * ajouter une séquence de conversation avec le gestionnaire pour prendre en compte
+   * l'existence diu satellite
+   */
 }
 
 // envoi de message sur le bus (CAN)
@@ -83,10 +89,10 @@ void messageTx()
 // test et lecture message sur bus (CAN)
 boolean messageRx() 
 {
-  if (FlagReceive) 
-  {
-    FlagReceive = false;   // if receive message from CAN bus
-    while (CAN_MSGAVAIL == can.checkReceive()) 
+  //if (FlagReceive) 
+  //{
+  //  FlagReceive = false;   // if receive message from CAN bus
+    if (CAN_MSGAVAIL == can.checkReceive()) 
     {
       can.readMsgBuf(&RxLen,RxBuf);
       CanRxId = can.getCanId();
@@ -102,9 +108,7 @@ boolean messageRx()
         Serial.print("Wrong RxLen:");Serial.println(RxLen);
       }
     }
-  }
-  // test si message   a completer
-  // lecture du message   a completer
+  //}
   return false; // ou true
 } 
 

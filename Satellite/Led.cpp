@@ -17,22 +17,11 @@ void Led::begin(uint8_t inPin)
 
 void Led::loop(uint8_t inNewState)
 {
-	if (inNewState == LED_BLINK && this->dimmer.isOff())
-	{
-		this->dimmer.startBlink();
-		this->dimmer.on();
-	}
-
-	if (inNewState == LED_ON && this->dimmer.isOff())
-	{
-		this->dimmer.stopBlink();
-		this->dimmer.on();
-	}
-
-	if (inNewState == LED_OFF && this->dimmer.isOn())
-	{
-		this->dimmer.off();
-	}
+  switch (inNewState) {
+    case LED_BLINK : this->dimmer.startBlink(); break;
+    case LED_ON    : this->dimmer.on(); break;
+    case LED_OFF   : this->dimmer.off(); break;
+  }
 }
 	
 uint8_t Led::EEPROM_chargement(int inAddr)

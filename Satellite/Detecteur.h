@@ -15,6 +15,7 @@ class Detecteur : public Objet
 
 	// Gestion locale
 	bool estDetecte;
+  bool etatPrecedent;
 	unsigned long precedentTest;
 	unsigned long perteDetection;
 

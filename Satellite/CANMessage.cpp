@@ -38,3 +38,11 @@ void CommandCANMessage::receive(uint8_t *inData)
   mData[1] = inData[1];
   mData[2] = inData[2];
 }
+
+void CommandCANMessage::transmit(uint8_t *inData)
+{
+  inData[0] = mData[0];
+  inData[1] = mData[1];
+  inData[2] = mData[2];
+}
+
