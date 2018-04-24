@@ -18,6 +18,8 @@ CommandCANMessage::CommandCANMessage()
   mData[0] = mData[1] =
     (LED_OFF << 6) | (LED_OFF << 4) | (LED_OFF << 2) | LED_OFF;
   mData[2] = (false << 7) | LED_OFF;
+  /* Initialise la trame des détecteurs tous Libres */
+  dData[0] = 0;
 }
 
 uint8_t CommandCANMessage::ledState(const uint8_t inLedNumber)
@@ -39,10 +41,8 @@ void CommandCANMessage::receive(uint8_t *inData)
   mData[2] = inData[2];
 }
 
-void CommandCANMessage::transmit(uint8_t *inData)
+void CommandCANMessage::transmit(unsigned char *outData)
 {
-  inData[0] = mData[0];
-  inData[1] = mData[1];
-  inData[2] = mData[2];
+  outData[0] = dData[0];
 }
 

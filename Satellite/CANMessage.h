@@ -18,13 +18,15 @@ class CommandCANMessage
 {
 private:
   uint8_t mData[3];
+  uint8_t dData[3];
 
 public:
   CommandCANMessage();
   uint8_t ledState(const uint8_t inLedNumber);
   bool pointState();
   void receive(uint8_t *inData);
-    void transmit(uint8_t *inData);
+  void transmit(unsigned char *outData);
 };
+
 
 #endif /* __CAN_MESSAGE_H__ */

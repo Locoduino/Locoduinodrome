@@ -16,10 +16,10 @@
 
 // CAN parameters
 
-const uint8_t CANInt = 2;                  // interrupt from CAN on pin 2 (int 0)
-const uint8_t canCS = 10;                     // 328P chip select for CAN
+const uint8_t CANInt = 2;               // interrupt from CAN on pin 2 (int 0)
+const uint8_t canCS = 10;               // 328P chip select for CAN
 
-MCP_CAN can(canCS);                        // CAN instance
+MCP_CAN can(canCS);                     // CAN instance
 
 const int baudrate = CAN_500KBPS;       // can throughput 500 Kb/s  
 const int RETRY_CONNECTION = 10;        // retry connection
@@ -54,8 +54,9 @@ void busInit(uint8_t id) // init CAN
 		delay(500);
 	}
 	pinMode(CANInt, INPUT);                                       // CAN int pin
-	attachInterrupt(0, MCP2515_ISR, FALLING);                     // CAN interrupt
-
+	//attachInterrupt(0, MCP2515_ISR, FALLING);                     // CAN interrupt
+  attachInterrupt(digitalPinToInterrupt(CANInt), MCP2515_ISR, FALLING);                     // CAN interrupt
+  
 	/*
 	* set mask & filters
 	* frameId = 32 + mSatelliteId = (32, 33, 34, 35, 36, 37, 38, 39}
@@ -82,7 +83,7 @@ void busInit(uint8_t id) // init CAN
 // envoi de message sur le bus (CAN)
 void messageTx() 
 {
-  byte sndStat = can.sendMsgBuf(CanTxId, 0, 3, TxBuf);
+  byte sndStat = can.sendMsgBuf(CanTxId, 0, 1, TxBuf);
  
 }
 

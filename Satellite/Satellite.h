@@ -59,8 +59,8 @@ const char *EEPROM_ID = { "LCDO" };
  
 //#define ID_SAT        0 // carre 4
 //#define ID_SAT        1 // carre 5
-#define ID_SAT        2 // carre 7 et aiguille 1
-//#define ID_SAT        3 // semaphore 1 et semaphore RR 8
+//#define ID_SAT        2 // carre 7 et aiguille 1
+#define ID_SAT        3 // semaphore 1 et semaphore RR 8
 //#define ID_SAT        4 // semaphore 0 et semaphore RR 9
 //#define ID_SAT        5 // carre RR 3
 //#define ID_SAT        6 // carre 6 et aiguille 0
@@ -188,8 +188,14 @@ public:
       delay(250);
       digitalWrite(leds_pins[i], LOW);
 		}
-		for (int i = 0; i < NB_AIGUILLES; i++)	this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
-		for (int i = 0; i < NB_DETECTEURS; i++)	this->AddObjet(&this->detecteurs[i], detecteurs_pins[i]);
+		for (int i = 0; i < NB_AIGUILLES; i++)	
+		{
+		  this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
+		}
+		for (int i = 0; i < NB_DETECTEURS; i++)	
+		{
+		  this->AddObjet(&this->detecteurs[i], detecteurs_pins[i]);
+		}
 
 		/*if (EEPROM_chargement() == false)
 			EEPROM_sauvegarde();*/

@@ -24,7 +24,7 @@ public:
 	virtual uint8_t EEPROM_sauvegarde(int inAddr) { return inAddr; }
 };
 
-// Assure la compatibilit� avec mes fonctions EEPROM dans Visual Studio...
+// Assure la compatibilite avec mes fonctions EEPROM dans Visual Studio...
 #ifdef VISUALSTUDIO
 #define EEPROMGET(SRC, DATA, SIZE)	EEPROM.get(SRC, &DATA, SIZE)
 #define EEPROMPUT(SRC, DATA, SIZE)	EEPROM.put(SRC, &DATA, SIZE)
