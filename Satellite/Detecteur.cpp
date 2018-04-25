@@ -55,13 +55,13 @@ void Detecteur::loop(uint8_t inNewState)
     if (activ)
     {
       statusMessage.setDetection(this->detectNumber, false);
-      void messageTx();
+      messageTx();
 		  Serial.println(F("Lib"));
     }
 	  else
     {
       statusMessage.setDetection(this->detectNumber, true);
-      void messageTx();
+      messageTx();
 		  Serial.println(F("Occ"));
     } 
   this->etatPrecedent = activ;
