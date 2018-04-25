@@ -1,7 +1,8 @@
 // Programme pour les cartes satellite du Locoduinodrome
 // Thierry 04 Avril 2018
+// Dominique 25 Avril 2018
 // Copyright Locoduino 2018
-// Version 0.0
+// Version 0.1
 
 #include "Bus.h"
 #include "Satellite.h"

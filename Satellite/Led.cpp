@@ -9,7 +9,7 @@ Led::Led()
 {
 }
 
-void Led::begin(uint8_t inPin)
+void Led::begin(uint8_t inPin, uint8_t inNumber)
 {
 	this->pin = inPin;
 	dimmer.begin(this->pin, HIGH);

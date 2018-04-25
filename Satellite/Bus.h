@@ -54,8 +54,7 @@ void busInit(uint8_t id) // init CAN
 		delay(500);
 	}
 	pinMode(CANInt, INPUT);                                       // CAN int pin
-	//attachInterrupt(0, MCP2515_ISR, FALLING);                     // CAN interrupt
-  attachInterrupt(digitalPinToInterrupt(CANInt), MCP2515_ISR, FALLING);                     // CAN interrupt
+  attachInterrupt(digitalPinToInterrupt(CANInt), MCP2515_ISR, FALLING); // CAN interrupt
   
 	/*
 	* set mask & filters
@@ -72,7 +71,7 @@ void busInit(uint8_t id) // init CAN
 	can.init_Filt(5, 0, canFilter);                // Reception possible : Id 32 (hex)
 
 	CanTxId = 0x10 + id;                           // messages emis = 0x10 + Id
-	Serial.print("CAN initialise avec id "); Serial.println(CanTxId);
+	Serial.print("CAN initialise avec id 0x"); Serial.println(CanTxId, HEX);
 
   /*
    * ajouter une séquence de conversation avec le gestionnaire pour prendre en compte
@@ -83,8 +82,7 @@ void busInit(uint8_t id) // init CAN
 // envoi de message sur le bus (CAN)
 void messageTx() 
 {
-  byte sndStat = can.sendMsgBuf(CanTxId, 0, 1, TxBuf);
- 
+  can.sendMsgBuf(CanTxId, 0, 1, TxBuf);
 }
 
 // test et lecture message sur bus (CAN)

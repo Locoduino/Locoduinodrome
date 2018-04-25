@@ -5,7 +5,7 @@
 
 #include "LightDimmer.h"
 
-/* Classe pour une Led, avec sa configuration, son �tat et ses fonctions de manipulation.
+/* Classe pour une Led, avec sa configuration, son etat et ses fonctions de manipulation.
 */
 class Led : public Objet
 {
@@ -15,7 +15,7 @@ class Led : public Objet
 public:
 	Led();
 
-	void begin(uint8_t inPin);
+	void begin(uint8_t inPin, uint8_t inNumber);
 	void loop(uint8_t inNewState);
 	static void loopPrioritaire() { LightDimmer::update();	}
 

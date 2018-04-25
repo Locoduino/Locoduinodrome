@@ -9,7 +9,7 @@ Aiguille::Aiguille()
 	this->estDroit = true;
 }
 
-void Aiguille::begin(uint8_t inPin)
+void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 {
 	this->pin = inPin;	// inutile puisque stockée dans ServoMoteur, mais puisque Objet le permet...
 

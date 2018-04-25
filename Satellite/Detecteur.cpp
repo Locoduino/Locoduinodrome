@@ -3,6 +3,7 @@
 
 #include "Objet.h"
 #include "Detecteur.h"
+#include "CANMessage.h"
 
 Detecteur::Detecteur()
 {
@@ -10,15 +11,16 @@ Detecteur::Detecteur()
 	this->remanence = 2000;
 	this->etatDetecte = HIGH;
   this->etatPrecedent = HIGH;
-
+  this->detectNumber = 0;
 	this->precedentTest = 0;
 	this->perteDetection = 0;
 }
 
-void Detecteur::begin(uint8_t inPin)
+void Detecteur::begin(uint8_t inPin, uint8_t inNumber)
 {
 	this->pin = inPin;
-	pinMode(this->pin, INPUT);
+  this->detectNumber = inNumber;
+	pinMode(this->pin, INPUT_PULLUP);
 	this->estDetecte = digitalRead(this->pin) == this->etatDetecte;
 }
 
@@ -49,10 +51,15 @@ void Detecteur::loop(uint8_t inNewState)
 	if (activ != this->etatPrecedent) 
   {
     if (activ)
+    {
+      statusMessage.setDetection(this->detectNumber, false);
 		  Serial.println(F("Liberation"));
+    }
 	  else
+    {
+      statusMessage.setDetection(this->detectNumber, true);
 		  Serial.println(F("Occupation"));
-      
+    } 
   this->etatPrecedent = activ;
   }
 	this->estDetecte = activ;

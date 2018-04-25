@@ -25,8 +25,19 @@ public:
   uint8_t ledState(const uint8_t inLedNumber);
   bool pointState();
   void receive(uint8_t *inData);
+};
+
+class StatusCANMessage
+{
+private:
+  uint8_t dData[3];
+
+public:
+  StatusCANMessage();
+  void setDetection(const uint8_t inDetectNumber, bool inDetectState);
   void transmit(unsigned char *outData);
 };
 
+extern  StatusCANMessage statusMessage;
 
 #endif /* __CAN_MESSAGE_H__ */

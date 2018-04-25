@@ -59,8 +59,8 @@ const char *EEPROM_ID = { "LCDO" };
  
 //#define ID_SAT        0 // carre 4
 //#define ID_SAT        1 // carre 5
-//#define ID_SAT        2 // carre 7 et aiguille 1
-#define ID_SAT        3 // semaphore 1 et semaphore RR 8
+#define ID_SAT        2 // carre 7 et aiguille 1
+//#define ID_SAT        3 // semaphore 1 et semaphore RR 8
 //#define ID_SAT        4 // semaphore 0 et semaphore RR 9
 //#define ID_SAT        5 // carre RR 3
 //#define ID_SAT        6 // carre 6 et aiguille 0
@@ -76,11 +76,11 @@ class Satellite
 	uint8_t		nbObjets;
 	byte		objetCourantLoop;
 
-	void AddObjet(Objet *inpObjet, uint8_t inPin)
+	void AddObjet(Objet *inpObjet, uint8_t inPin, uint8_t inNumber)
 	{
 		if (inpObjet != NULL && inPin != 255)
 		{
-			inpObjet->begin(inPin);
+			inpObjet->begin(inPin, inNumber);
 			this->objets[this->nbObjets] = inpObjet;
 		}
 		this->nbObjets++;
@@ -117,7 +117,7 @@ class Satellite
 				addr = objets[i]->EEPROM_sauvegarde(addr);
 	}
 
-	/* Chargement de la configuration depuis l'EEPROM. La fonction retourne true si tout est bien charg�. */
+	/* Chargement de la configuration depuis l'EEPROM. La fonction retourne true si tout est bien charge. */
 	bool EEPROM_chargement()
 	{
 		int addr = 0;
@@ -165,7 +165,8 @@ public:
 	Aiguille	aiguilles[NB_AIGUILLES];
 	Detecteur	detecteurs[NB_DETECTEURS];
 
-	CommandCANMessage Message;
+	CommandCANMessage MessageIn;
+
 
  	Satellite()
 	{
@@ -183,18 +184,18 @@ public:
 		this->nbObjets = 0;
 		for (int i = 0; i < NB_LEDS; i++)
 		{
-		  this->AddObjet(&this->leds[i], leds_pins[i]);
+		  this->AddObjet(&this->leds[i], leds_pins[i], i);
       digitalWrite(leds_pins[i], HIGH);
       delay(250);
       digitalWrite(leds_pins[i], LOW);
 		}
 		for (int i = 0; i < NB_AIGUILLES; i++)	
 		{
-		  this->AddObjet(&this->aiguilles[i], aiguilles_pins[i]);
+		  this->AddObjet(&this->aiguilles[i], aiguilles_pins[i], i);
 		}
 		for (int i = 0; i < NB_DETECTEURS; i++)	
 		{
-		  this->AddObjet(&this->detecteurs[i], detecteurs_pins[i]);
+		  this->AddObjet(&this->detecteurs[i], detecteurs_pins[i], i);
 		}
 
 		/*if (EEPROM_chargement() == false)
@@ -205,9 +206,8 @@ public:
 	{
 		if (messageRx())
     {
-			this->Message.receive(RxBuf); // synchronisation sur les réceptions periodiques
-      this->Message.transmit(TxBuf);// des emissions concernant les capteurs
-      messageTx();
+			this->MessageIn.receive(RxBuf); // synchronisation sur les réceptions periodiques
+      messageTx();                    // des emissions periodiquesconcernant les capteurs
     }
 		
 		// traite les loop prioritaires
@@ -221,10 +221,10 @@ public:
 			uint8_t etat = 0;
 
 			if (this->objetCourantLoop < NB_LEDS)
-				etat = this->Message.ledState(this->objetCourantLoop);
+				etat = this->MessageIn.ledState(this->objetCourantLoop);
 			else
 				if (this->objetCourantLoop < NB_LEDS + NB_AIGUILLES)
-					etat = this->Message.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
+					etat = this->MessageIn.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
 			objets[this->objetCourantLoop]->loop(etat);
 		}
 

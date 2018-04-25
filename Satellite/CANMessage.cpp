@@ -6,6 +6,7 @@
  * Classe pour les messages CAN
  */
 
+#include <Arduino.h>
 #include "CANMessage.h"
 #include "Messaging.h"
 
@@ -41,8 +42,28 @@ void CommandCANMessage::receive(uint8_t *inData)
   mData[2] = inData[2];
 }
 
-void CommandCANMessage::transmit(unsigned char *outData)
+/*
+ * Message CAN d'etat des detecteurs emis vers le gestionnaire
+ */
+StatusCANMessage::StatusCANMessage()
+{
+  /* Initialise la trame des détecteurs tous Libres */
+  dData[0] = 0;
+}
+
+void StatusCANMessage::setDetection(const uint8_t inDetectNumber, bool inDetectState)
+{
+  bitWrite(dData[0], inDetectNumber, inDetectState);
+
+}
+
+void StatusCANMessage::transmit(unsigned char *outData)
 {
   outData[0] = dData[0];
 }
+
+/*
+ * instance de StatusCANMessage
+ */
+StatusCANMessage statusMessage;
 

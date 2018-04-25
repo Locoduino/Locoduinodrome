@@ -12,13 +12,14 @@ class Aiguille : public Objet
 	// Configuration
 
 	// Gestion locale
-	SMSSmoothBounce servoMoteur;
+  SMSSmooth servoMoteur;
+	//SMSSmoothBounce servoMoteur;
 	bool estDroit;
 	
 public:
 	Aiguille();
 
-	void begin(uint8_t inPin);
+	void begin(uint8_t inPin, uint8_t inNumber);
 	void loop(uint8_t inNewState);
 	static void loopPrioritaire() { SlowMotionServo::update(); }
 
