@@ -9,7 +9,6 @@
 #include <Arduino.h>
 #include "CANMessage.h"
 #include "Messaging.h"
-
 /*
  * Message CAN de commande venant du gestionnaire
  */
@@ -45,6 +44,10 @@ void CommandCANMessage::receive(uint8_t *inData)
 /*
  * Message CAN d'etat des detecteurs emis vers le gestionnaire
  */
+
+extern unsigned char TxBuf[8]; 
+extern void messageTx();
+
 StatusCANMessage::StatusCANMessage()
 {
   /* Initialise la trame des détecteurs tous Libres */
@@ -54,13 +57,10 @@ StatusCANMessage::StatusCANMessage()
 void StatusCANMessage::setDetection(const uint8_t inDetectNumber, bool inDetectState)
 {
   bitWrite(dData[0], inDetectNumber, inDetectState);
-
+  TxBuf[0] = dData[0];
 }
 
-void StatusCANMessage::transmit(unsigned char *outData)
-{
-  outData[0] = dData[0];
-}
+
 
 /*
  * instance de StatusCANMessage

@@ -18,7 +18,7 @@ void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 	servoMoteur.setPin(this->pin);
   servoMoteur.setMin(1000);
   servoMoteur.setMax(1800);
-  servoMoteur.setSpeed(1.5);
+  servoMoteur.setSpeed(2.0);
 }
 
 void Aiguille::loop(uint8_t inEstDroit)

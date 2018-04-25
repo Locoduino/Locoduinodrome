@@ -35,7 +35,6 @@ private:
 public:
   StatusCANMessage();
   void setDetection(const uint8_t inDetectNumber, bool inDetectState);
-  void transmit(unsigned char *outData);
 };
 
 extern  StatusCANMessage statusMessage;

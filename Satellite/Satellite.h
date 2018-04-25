@@ -59,8 +59,8 @@ const char *EEPROM_ID = { "LCDO" };
  
 //#define ID_SAT        0 // carre 4
 //#define ID_SAT        1 // carre 5
-#define ID_SAT        2 // carre 7 et aiguille 1
-//#define ID_SAT        3 // semaphore 1 et semaphore RR 8
+//#define ID_SAT        2 // carre 7 et aiguille 1
+#define ID_SAT        3 // semaphore 1 et semaphore RR 8
 //#define ID_SAT        4 // semaphore 0 et semaphore RR 9
 //#define ID_SAT        5 // carre RR 3
 //#define ID_SAT        6 // carre 6 et aiguille 0
@@ -207,7 +207,7 @@ public:
 		if (messageRx())
     {
 			this->MessageIn.receive(RxBuf); // synchronisation sur les réceptions periodiques
-      messageTx();                    // des emissions periodiquesconcernant les capteurs
+      messageTx();                    // des emissions periodiques concernant les capteurs
     }
 		
 		// traite les loop prioritaires

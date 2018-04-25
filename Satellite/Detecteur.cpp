@@ -5,10 +5,12 @@
 #include "Detecteur.h"
 #include "CANMessage.h"
 
+extern messageTx();
+
 Detecteur::Detecteur()
 {
-	this->intervalle = 300;
-	this->remanence = 2000;
+	this->intervalle = 100;
+	this->remanence = 1000;
 	this->etatDetecte = HIGH;
   this->etatPrecedent = HIGH;
   this->detectNumber = 0;
@@ -30,11 +32,11 @@ void Detecteur::loop(uint8_t inNewState)
 		return;
 
 	this->precedentTest = millis();
-	int etat = digitalRead(this->pin);
+	int etat = digitalRead(this->pin);        // Occupation=LOW, liberation=HIGH
 
 	bool activ = etat == this->etatDetecte;
 
-	if (!activ && activ != this->estDetecte)
+	if (activ && activ != this->estDetecte)
 	{
 		if (this->perteDetection == 0)
 		{
@@ -53,12 +55,14 @@ void Detecteur::loop(uint8_t inNewState)
     if (activ)
     {
       statusMessage.setDetection(this->detectNumber, false);
-		  Serial.println(F("Liberation"));
+      void messageTx();
+		  Serial.println(F("Lib"));
     }
 	  else
     {
       statusMessage.setDetection(this->detectNumber, true);
-		  Serial.println(F("Occupation"));
+      void messageTx();
+		  Serial.println(F("Occ"));
     } 
   this->etatPrecedent = activ;
   }
