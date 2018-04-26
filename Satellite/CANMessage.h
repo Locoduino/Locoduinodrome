@@ -24,6 +24,7 @@ public:
   CommandCANMessage();
   uint8_t ledState(const uint8_t inLedNumber);
   bool pointState();
+  uint8_t buteeState();
   void receive(uint8_t *inData);
 };
 

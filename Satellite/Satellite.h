@@ -218,13 +218,28 @@ public:
 		if (objets[this->objetCourantLoop] != NULL)
 		{
 			// fait juste le loop de l'objet courant
-			uint8_t etat = 0;
+	    uint8_t etat = 0;
 
 			if (this->objetCourantLoop < NB_LEDS)
-				etat = this->MessageIn.ledState(this->objetCourantLoop);
+      {
+		    etat = this->MessageIn.ledState(this->objetCourantLoop);
+      }
 			else
+      {
 				if (this->objetCourantLoop < NB_LEDS + NB_AIGUILLES)
+        {
 					etat = this->MessageIn.pointState();	// i - NB_LEDS le jour où il y aura plus d'une aiguille.
+          switch (this->MessageIn.buteeState()) 
+          {
+            case 2: // butee courante --
+            //objets[this->objetCourantLoop]->setButee(false);
+            break;
+            case 3: // butee courante ++
+            //objets[this->objetCourantLoop]->setButee(true);
+            break;
+          }
+        }
+      }
 			objets[this->objetCourantLoop]->loop(etat);
 		}
 

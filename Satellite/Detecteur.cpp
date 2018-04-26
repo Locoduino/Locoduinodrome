@@ -5,7 +5,7 @@
 #include "Detecteur.h"
 #include "CANMessage.h"
 
-extern messageTx();
+extern void messageTx();
 
 Detecteur::Detecteur()
 {

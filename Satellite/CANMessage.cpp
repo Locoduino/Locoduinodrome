@@ -34,6 +34,12 @@ bool CommandCANMessage::pointState()
   return (mData[2] & 0x80) != 0;
 }
 
+uint8_t CommandCANMessage::buteeState()
+{
+  return ((mData[2] & 0x60) >> 5);
+  // 0 = rien, 2 = --, 3 = ++
+}
+
 void CommandCANMessage::receive(uint8_t *inData)
 {
   mData[0] = inData[0];
