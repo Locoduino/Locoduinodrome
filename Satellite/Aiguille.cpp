@@ -25,22 +25,24 @@ void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 
 void Aiguille::loop(Satellite *inpSat)
 {
+	// Configuration
+	switch (inpSat->MessageIn.buteeState())
+	{
+	case 2: // butee courante --
+		this->setButee(false);
+		return;
+	case 3: // butee courante ++
+		this->setButee(true);
+		return;
+	}
+
+	// Execution
 	uint8_t inEstDroit = inpSat->MessageIn.pointState();
 	if ((bool)inEstDroit == this->estDroit)
 		return;
 
 	this->estDroit = (bool)inEstDroit;
 	this->servoMoteur.goTo(inEstDroit ? 0.0f : 1.0f);
-
-	switch (inpSat->MessageIn.buteeState())
-	{
-	case 2: // butee courante --
-			//objets[this->objetCourantLoop]->setButee(false);
-		break;
-	case 3: // butee courante ++
-			//objets[this->objetCourantLoop]->setButee(true);
-		break;
-	}
 }
 
 void Aiguille::setButee(bool inSens)

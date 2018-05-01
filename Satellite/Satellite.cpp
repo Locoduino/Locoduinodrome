@@ -145,8 +145,8 @@ void Satellite::begin()
 		this->AddObjet(&this->detecteurs[i], detecteurs_pins[i], i);
 	}
 
-	/*if (EEPROM_chargement() == false)
-		EEPROM_sauvegarde();*/
+	if (EEPROM_chargement() == false)
+		EEPROM_sauvegarde();
 }
 
 void Satellite::loop()
