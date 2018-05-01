@@ -54,7 +54,7 @@ void busInit(uint8_t id) // init CAN
 		delay(500);
 	}
 	pinMode(CANInt, INPUT);                                       // CAN int pin
-  attachInterrupt(digitalPinToInterrupt(CANInt), MCP2515_ISR, FALLING); // CAN interrupt
+	attachInterrupt(digitalPinToInterrupt(CANInt), MCP2515_ISR, FALLING); // CAN interrupt
   
 	/*
 	* set mask & filters

@@ -1,27 +1,31 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "Satellite.h"
 #include "Objet.h"
 #include "Led.h"
 #include "Messaging.h"
 
 Led::Led()
 {
+	this->number = 0;
 }
 
 void Led::begin(uint8_t inPin, uint8_t inNumber)
 {
 	this->pin = inPin;
+	this->number = inNumber;
 	dimmer.begin(this->pin, HIGH);
 }
 
-void Led::loop(uint8_t inNewState)
+void Led::loop(Satellite *inpSat)
 {
-  switch (inNewState) {
-    case LED_BLINK : this->dimmer.startBlink(); break;
-    case LED_ON    : this->dimmer.on(); break;
-    case LED_OFF   : this->dimmer.off(); break;
-  }
+	uint8_t inNewState = inpSat->MessageIn.ledState(this->number);
+	switch (inNewState) {
+		case LED_BLINK:	this->dimmer.startBlink(); break;
+		case LED_ON:	this->dimmer.on(); break;
+		case LED_OFF:	this->dimmer.off(); break;
+	}
 }
 	
 uint8_t Led::EEPROM_chargement(int inAddr)

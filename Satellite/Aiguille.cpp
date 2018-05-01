@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "Satellite.h"
 #include "Objet.h"
 #include "Aiguille.h"
 
@@ -12,43 +13,56 @@ Aiguille::Aiguille()
 void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 {
 	this->pin = inPin;	// inutile puisque stockée dans ServoMoteur, mais puisque Objet le permet...
-  this->minimum = 1200;
-  this->maximum = 1750;
+	this->number = inNumber;
+
 	servoMoteur.setReverted(true);
 	servoMoteur.setInitialPosition(this->estDroit ? 0.0f : 1.0f);
 	servoMoteur.setPin(this->pin);
-  servoMoteur.setMin(this->minimum);   // faible amplitude par défaut pour éviter 
-  servoMoteur.setMax(this->maximum);   // trop de contrainte sur l'aiguille avant configuration
-  servoMoteur.setSpeed(2.0);
+	servoMoteur.setMin(1200);   // faible amplitude par défaut pour éviter 
+	servoMoteur.setMax(1750);   // trop de contrainte sur l'aiguille avant configuration
+	servoMoteur.setSpeed(2.0);
 }
 
-void Aiguille::loop(uint8_t inEstDroit)
+void Aiguille::loop(Satellite *inpSat)
 {
+	uint8_t inEstDroit = inpSat->MessageIn.pointState();
 	if ((bool)inEstDroit == this->estDroit)
 		return;
 
 	this->estDroit = (bool)inEstDroit;
 	this->servoMoteur.goTo(inEstDroit ? 0.0f : 1.0f);
+
+	switch (inpSat->MessageIn.buteeState())
+	{
+	case 2: // butee courante --
+			//objets[this->objetCourantLoop]->setButee(false);
+		break;
+	case 3: // butee courante ++
+			//objets[this->objetCourantLoop]->setButee(true);
+		break;
+	}
 }
 
 void Aiguille::setButee(bool inSens)
 {
-  if (this->estDroit)
-  {
-    if (inSens) 
-      minimum--;
-    else
-      minimum++;
-    this->servoMoteur.setMin(this->minimum);   
-  }
-  else
-  {
-    if (inSens) 
-      maximum--;
-    else
-      maximum++;
-    this->servoMoteur.setMax(this->maximum);
-  } 
+	if (this->estDroit)
+	{
+		int minimum = this->servoMoteur.minimumPulse();
+		if (inSens)
+			minimum--;
+		else
+			minimum++;
+		this->servoMoteur.setMin(minimum);
+	}
+	else
+	{
+		int maximum = this->servoMoteur.maximumPulse();
+		if (inSens)
+			maximum--;
+		else
+			maximum++;
+		this->servoMoteur.setMax(maximum);
+	}
 }
 
 uint8_t Aiguille::EEPROM_chargement(int inAddr)

@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "Satellite.h"
 #include "Objet.h"
 #include "Detecteur.h"
-#include "CANMessage.h"
 
 extern void messageTx();
 
@@ -12,8 +12,7 @@ Detecteur::Detecteur()
 	this->intervalle = 100;
 	this->remanence = 1000;
 	this->etatDetecte = HIGH;
-  this->etatPrecedent = HIGH;
-  this->detectNumber = 0;
+	this->etatPrecedent = HIGH;
 	this->precedentTest = 0;
 	this->perteDetection = 0;
 }
@@ -21,12 +20,12 @@ Detecteur::Detecteur()
 void Detecteur::begin(uint8_t inPin, uint8_t inNumber)
 {
 	this->pin = inPin;
-  this->detectNumber = inNumber;
+	this->number = inNumber;
 	pinMode(this->pin, INPUT_PULLUP);
 	this->estDetecte = digitalRead(this->pin) == this->etatDetecte;
 }
 
-void Detecteur::loop(uint8_t inNewState)
+void Detecteur::loop(Satellite *inpSat)
 {
 	if (millis() - this->precedentTest < this->intervalle)
 		return;
@@ -54,13 +53,13 @@ void Detecteur::loop(uint8_t inNewState)
   {
     if (activ)
     {
-      statusMessage.setDetection(this->detectNumber, false);
+      statusMessage.setDetection(this->number, false);
       messageTx();
 		  Serial.println(F("Lib"));
     }
 	  else
     {
-      statusMessage.setDetection(this->detectNumber, true);
+      statusMessage.setDetection(this->number, true);
       messageTx();
 		  Serial.println(F("Occ"));
     } 

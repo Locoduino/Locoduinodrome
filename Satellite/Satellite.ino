@@ -4,7 +4,6 @@
 // Copyright Locoduino 2018
 // Version 0.1 
 
-#include "Bus.h"
 #include "Satellite.h"
 
 Satellite sat;

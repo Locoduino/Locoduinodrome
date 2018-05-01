@@ -10,19 +10,19 @@
 class Aiguille : public Objet
 {
 	// Configuration
-  int minimum, maximum;
+
 	// Gestion locale
-  SMSSmooth servoMoteur;
-	//SMSSmoothBounce servoMoteur;
+	SMSSmooth servoMoteur;
+
 	bool estDroit;
 	
 public:
 	Aiguille();
 
 	void begin(uint8_t inPin, uint8_t inNumber);
-	void loop(uint8_t inNewState);
+	void loop(Satellite *inpSat);
 	static void loopPrioritaire() { SlowMotionServo::update(); }
-  void setButee(bool inSens);
+	void setButee(bool inSens);
 
 	uint8_t GetEEPROMSize()	{ return Objet::GetEEPROMSize() + (2 * sizeof(unsigned int)) + sizeof(float); }
 	uint8_t EEPROM_chargement(int inAddr);

@@ -14,9 +14,8 @@ class Detecteur : public Objet
 	byte etatDetecte;
 
 	// Gestion locale
-  uint8_t detectNumber;
 	bool estDetecte;
-  bool etatPrecedent;
+	bool etatPrecedent;
 	unsigned long precedentTest;
 	unsigned long perteDetection;
 
@@ -24,7 +23,7 @@ public:
 	Detecteur();
 
 	void begin(uint8_t inPin, uint8_t inNumber);
-	void loop(uint8_t inNewState);
+	void loop(Satellite *inpSat);
 	static void loopPrioritaire() { }
 
 	bool EstActivee() {	return this->estDetecte; }

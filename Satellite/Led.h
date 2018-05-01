@@ -9,6 +9,7 @@
 */
 class Led : public Objet
 {
+private:
 	// Gestion locale
 	LightDimmerSoft dimmer;
 
@@ -16,7 +17,7 @@ public:
 	Led();
 
 	void begin(uint8_t inPin, uint8_t inNumber);
-	void loop(uint8_t inNewState);
+	void loop(Satellite *inpSat);
 	static void loopPrioritaire() { LightDimmer::update();	}
 
 	uint8_t GetEEPROMSize() { return Objet::GetEEPROMSize() + sizeof(unsigned int) + (2 * sizeof(unsigned long)); }
