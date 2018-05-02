@@ -8,7 +8,7 @@
 #include "Detecteur.h"
 #include "Led.h"
 
-#include "bus.h"
+#include "CANBus.h"
 #include "CANMessage.h"
 
 const uint8_t leds_pins[] = { 3, 4, 5, 6, 7, 8, 9, A0, A1 };
@@ -125,7 +125,7 @@ Satellite::Satellite()
 void Satellite::begin()
 {
 	this->id = ID_SAT;
-	busInit(this->id);
+	Bus.begin(this->id);
 
 	this->nbObjets = 0;
 	for (int i = 0; i < NB_LEDS; i++)
@@ -151,10 +151,10 @@ void Satellite::begin()
 
 void Satellite::loop()
 {
-	if (messageRx())
+	if (Bus.messageRx())
 	{
-		this->MessageIn.receive(RxBuf); // synchronisation sur les réceptions periodiques
-		messageTx();                    // des emissions periodiques concernant les capteurs
+		this->MessageIn.receive(Bus.RxBuf); // synchronisation sur les réceptions periodiques
+		Bus.messageTx();                    // des emissions periodiques concernant les capteurs
 	}
 
 	// traite les loop prioritaires

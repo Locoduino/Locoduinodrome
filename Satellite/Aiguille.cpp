@@ -26,7 +26,7 @@ void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 void Aiguille::loop(Satellite *inpSat)
 {
 	// Configuration
-	switch (inpSat->MessageIn.buteeState())
+	switch (inpSat->MessageIn.configButeeState())
 	{
 	case 2: // butee courante --
 		this->setButee(false);

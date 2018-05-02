@@ -34,7 +34,7 @@ bool CommandCANMessage::pointState()
   return (mData[2] & 0x80) != 0;
 }
 
-uint8_t CommandCANMessage::buteeState()
+uint8_t CommandCANMessage::configButeeState()
 {
   return ((mData[2] & 0x60) >> 5);
   // 0 = rien, 2 = --, 3 = ++
@@ -51,25 +51,16 @@ void CommandCANMessage::receive(uint8_t *inData)
  * Message CAN d'etat des detecteurs emis vers le gestionnaire
  */
 
-extern unsigned char TxBuf[8]; 
-extern void messageTx();
-
 StatusCANMessage::StatusCANMessage()
 {
   /* Initialise la trame des détecteurs tous Libres */
   dData[0] = 0;
 }
 
-void StatusCANMessage::setDetection(const uint8_t inDetectNumber, bool inDetectState)
+void StatusCANMessage::setDetection(uint8_t *inData, const uint8_t inDetectNumber, bool inDetectState)
 {
   bitWrite(dData[0], inDetectNumber, inDetectState);
-  TxBuf[0] = dData[0];
+  inData[0] = dData[0];
 }
 
-
-
-/*
- * instance de StatusCANMessage
- */
-StatusCANMessage statusMessage;
 

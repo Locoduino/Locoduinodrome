@@ -24,6 +24,9 @@
  * pin A7 (nu)
  */ 
  
+#ifndef _Satellite_H_
+#define _Satellite_H_
+
 #if !defined (__AVR_ATmega328P__)
 #if !defined VISUALSTUDIO
   #error CANNOT COMPILE - ONLY WORKS WITH AN ARDUINO UNO, NANO OR MINI
@@ -38,6 +41,7 @@
 #include "Detecteur.h"
 #include "Led.h"
 
+#include "CANBus.h"
 #include "CANMessage.h"
 
 #define LONGUEUR_ETAT	3
@@ -66,9 +70,12 @@ private:
 	bool EEPROM_chargement();
 
 public:
+	CANBus Bus;
 	CommandCANMessage MessageIn;
+	StatusCANMessage StatusMessage;
 
 	Satellite();
 	void begin();
 	void loop();
 };
+#endif

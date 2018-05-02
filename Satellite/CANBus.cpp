@@ -1,49 +1,26 @@
-//-------------------------------------------------------------------
-#ifndef __bus_H__
-#define __bus_H__
-//-------------------------------------------------------------------
-
 // gestion du bus (Can)
-
-#ifndef VISUALSTUDIO
 
 /////////////////////////////////////////////////////////////////////////////
 //#include <Arduino.h>
 //#include <SPI.h>      //  SPI library
-#include <mcp_can.h>    // MCP2515 library
-#include <mcp_can_dfs.h>
+#include "CANBus.h"
 #include "CANMessage.h"
 
 // CAN parameters
 
-const uint8_t CANInt = 2;               // interrupt from CAN on pin 2 (int 0)
-const uint8_t canCS = 10;               // 328P chip select for CAN
-
-MCP_CAN can(canCS);                     // CAN instance
-
-const int baudrate = CAN_500KBPS;       // can throughput 500 Kb/s  
-const int RETRY_CONNECTION = 10;        // retry connection
-
 volatile bool FlagReceive = false;      // can interrupt flag
+MCP_CAN can(canCS);                     // CAN instance
 
 // message CAN information
 
-unsigned long CanRxId;
-unsigned char RxLen = 0;        // length of data, 3 octets by message
-unsigned char RxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
-
-unsigned long CanTxId;
-unsigned char TxLen = 0;        // length of data, 3 octets by message
-unsigned char TxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
-
+#ifndef VISUALSTUDIO
 
 // CAN interrupt routine
 
 void MCP2515_ISR() {FlagReceive = true;}
 
-
 // initialisation du bus
-void busInit(uint8_t id) // init CAN
+void CANBus::begin(uint8_t id) // init CAN
 {
 	uint8_t canFilter = 0x20 + id;                              // messages recus = 0x20 + Id
 	int repeat = RETRY_CONNECTION;                              // try to open the CAN
@@ -80,13 +57,13 @@ void busInit(uint8_t id) // init CAN
 }
 
 // envoi de message sur le bus (CAN)
-void messageTx() 
+void CANBus::messageTx()
 {
   can.sendMsgBuf(CanTxId, 0, 1, TxBuf);
 }
 
 // test et lecture message sur bus (CAN)
-boolean messageRx() 
+bool CANBus::messageRx()
 {
   //if (FlagReceive) 
   //{
@@ -113,22 +90,18 @@ boolean messageRx()
 
 /////////////////////////////////////////////////////////////////////////////
 #else
-unsigned char RxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
-unsigned char TxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
-
-void busInit(uint8_t id)
+void CANBus::begin(uint8_t id)
 {
 }
 
 // envoi de message sur le bus (CAN)
-void messageTx()
+void CANBus::messageTx()
 {
 }
 
 // test et lecture message sur bus (CAN) = non utilisé => voir loop
-boolean messageRx() 
+bool CANBus::messageRx()
 {
 	return false;
 }
-#endif
 #endif

@@ -4,8 +4,7 @@
 #include "Satellite.h"
 #include "Objet.h"
 #include "Detecteur.h"
-
-extern void messageTx();
+#include "CANBus.h"
 
 Detecteur::Detecteur()
 {
@@ -49,22 +48,22 @@ void Detecteur::loop(Satellite *inpSat)
 		this->perteDetection = 0;
 	}
 
-	if (activ != this->etatPrecedent) 
-  {
-    if (activ)
-    {
-      statusMessage.setDetection(this->number, false);
-      messageTx();
-		  Serial.println(F("Lib"));
-    }
-	  else
-    {
-      statusMessage.setDetection(this->number, true);
-      messageTx();
-		  Serial.println(F("Occ"));
-    } 
-  this->etatPrecedent = activ;
-  }
+	if (activ != this->etatPrecedent)
+	{
+		if (activ)
+		{
+			inpSat->StatusMessage.setDetection(inpSat->Bus.TxBuf, this->number, false);
+			inpSat->Bus.messageTx();
+			Serial.println(F("Lib"));
+		}
+		else
+		{
+			inpSat->StatusMessage.setDetection(inpSat->Bus.TxBuf, this->number, true);
+			inpSat->Bus.messageTx();
+			Serial.println(F("Occ"));
+		}
+		this->etatPrecedent = activ;
+	}
 	this->estDetecte = activ;
 }
 
