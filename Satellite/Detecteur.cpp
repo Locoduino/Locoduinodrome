@@ -67,20 +67,6 @@ void Detecteur::loop(Satellite *inpSat)
 	this->estDetecte = activ;
 }
 
-uint8_t Detecteur::EEPROM_chargement(int inAddr)
-{
-	int addr = Objet::EEPROM_chargement(inAddr);
-
-	EEPROMGET(addr, this->intervalle, sizeof(unsigned long));
-	addr += sizeof(unsigned long);
-	EEPROMGET(addr, this->remanence, sizeof(unsigned long));
-	addr += sizeof(unsigned long);
-	EEPROMGET(addr, this->etatDetecte, sizeof(byte));
-	addr += sizeof(byte);
-
-	return addr;
-}
-
 uint8_t Detecteur::EEPROM_sauvegarde(int inAddr)
 {
 	int addr = Objet::EEPROM_sauvegarde(inAddr);
@@ -90,6 +76,20 @@ uint8_t Detecteur::EEPROM_sauvegarde(int inAddr)
 	EEPROMPUT(addr, this->remanence, sizeof(unsigned long));
 	addr += sizeof(unsigned long);
 	EEPROMPUT(addr, this->etatDetecte, sizeof(byte));
+	addr += sizeof(byte);
+
+	return addr;
+}
+
+uint8_t Detecteur::EEPROM_chargement(int inAddr)
+{
+	int addr = Objet::EEPROM_chargement(inAddr);
+
+	EEPROMGET(addr, this->intervalle, sizeof(unsigned long));
+	addr += sizeof(unsigned long);
+	EEPROMGET(addr, this->remanence, sizeof(unsigned long));
+	addr += sizeof(unsigned long);
+	EEPROMGET(addr, this->etatDetecte, sizeof(byte));
 	addr += sizeof(byte);
 
 	return addr;

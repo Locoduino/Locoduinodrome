@@ -17,19 +17,6 @@ const uint8_t detecteurs_pins[] = { A3, A4, A5 };
 
 const char *EEPROM_ID = { "LCDO" };
 
-/*
- * Temporairement on peut fixer l'Id des satellites à la main !
- */
- 
-//#define ID_SAT        0 // carre 4
-//#define ID_SAT        1 // carre 5
-//#define ID_SAT        2 // carre 7 et aiguille 1
-#define ID_SAT        3 // semaphore 1 et semaphore RR 8
-//#define ID_SAT        4 // semaphore 0 et semaphore RR 9
-//#define ID_SAT        5 // carre RR 3
-//#define ID_SAT        6 // carre 6 et aiguille 0
-//#define ID_SAT        7 // carre RR 2
-
 void Satellite::AddObjet(Objet *inpObjet, uint8_t inPin, uint8_t inNumber)
 {
 	if (inpObjet != NULL && inPin != 255)
@@ -51,24 +38,24 @@ void Satellite::EEPROM_sauvegarde()
 	Ca signifie aussi que changer la forme (nombre d'objets, taille d'un objet) annule toute sauvegarde !
 	*/
 
-	eeprom_write_block(EEPROM_ID, (void *)addr, 4);
+	eeprom_update_block(EEPROM_ID, (void *)addr, 4);
 	addr += 4;
 
-	EEPROM.write(addr++, this->nbObjets);
+	EEPROM.update(addr++, this->nbObjets);
 
-	EEPROM.write(addr++, leds[0].GetEEPROMSize());
-	EEPROM.write(addr++, aiguilles[0].GetEEPROMSize());
-	EEPROM.write(addr++, detecteurs[0].GetEEPROMSize());
+	EEPROM.update(addr++, leds[0].GetEEPROMSize());
+	EEPROM.update(addr++, aiguilles[0].GetEEPROMSize());
+	EEPROM.update(addr++, detecteurs[0].GetEEPROMSize());
 
 	////////////////////////////////////// Partie satellite
 
-	EEPROM.write(addr++, this->id);
+	EEPROM.update(addr++, this->id);
 
 	////////////////////////////////////// Partie objets
 
 	for (int i = 0; i < this->nbObjets; i++)
-		if (objets[i] != NULL)
-			addr = objets[i]->EEPROM_sauvegarde(addr);
+		if (this->objets[i] != NULL)
+			addr = this->objets[i]->EEPROM_sauvegarde(addr);
 }
 
 /* Chargement de la configuration depuis l'EEPROM. La fonction retourne true si tout est bien charge. */
@@ -108,8 +95,8 @@ bool Satellite::EEPROM_chargement()
 	////////////////////////////////////// Partie objets
 
 	for (int i = 0; i < this->nbObjets; i++)
-		if (objets[i] != NULL)
-			addr = objets[i]->EEPROM_chargement(addr);
+		if (this->objets[i] != NULL)
+			addr = this->objets[i]->EEPROM_chargement(addr);
 
 	return true;
 }
@@ -118,14 +105,15 @@ Satellite::Satellite()
 {
 	this->nbObjets = 0;
 	for (int i = 0; i < NB_LEDS + NB_AIGUILLES + NB_DETECTEURS; i++)
-		objets[i] = NULL;
+		this->objets[i] = NULL;
 	this->objetCourantLoop = 0;
+	this->modeConfig = false;
 }
 
-void Satellite::begin()
+void Satellite::begin(uint8_t inId)
 {
-	this->id = ID_SAT;
-	Bus.begin(this->id);
+	this->id = inId;
+	this->Bus.begin(this->id);
 
 	this->nbObjets = 0;
 	for (int i = 0; i < NB_LEDS; i++)
@@ -145,16 +133,19 @@ void Satellite::begin()
 		this->AddObjet(&this->detecteurs[i], detecteurs_pins[i], i);
 	}
 
-	if (EEPROM_chargement() == false)
-		EEPROM_sauvegarde();
+	if (this->EEPROM_chargement() == false)
+		this->EEPROM_sauvegarde();
 }
 
 void Satellite::loop()
 {
-	if (Bus.messageRx())
+	// Entre en mode config dès qu'un message de config temporaire est reçu.
+	this->modeConfig = (this->MessageIn.IsConfig() && !this->MessageIn.IsPermanentConfig());
+		
+	if (this->Bus.messageRx())
 	{
-		this->MessageIn.receive(Bus.RxBuf); // synchronisation sur les réceptions periodiques
-		Bus.messageTx();                    // des emissions periodiques concernant les capteurs
+		this->MessageIn.receive(this->Bus.RxBuf); // synchronisation sur les réceptions periodiques
+		this->Bus.messageTx();                    // des emissions periodiques concernant les capteurs
 	}
 
 	// traite les loop prioritaires
@@ -162,8 +153,8 @@ void Satellite::loop()
 	Detecteur::loopPrioritaire();
 	Led::loopPrioritaire();
 
-	if (objets[this->objetCourantLoop] != NULL)
-		objets[this->objetCourantLoop]->loop(this);
+	if (this->objets[this->objetCourantLoop] != NULL)
+		this->objets[this->objetCourantLoop]->loop(this);
 
 	// puis passe à l'objet suivant pour le prochain loop...
 	this->objetCourantLoop++;
@@ -171,4 +162,13 @@ void Satellite::loop()
 	// Si on est à la fin de la liste, on recommence !
 	if (this->objetCourantLoop >= this->nbObjets)
 		this->objetCourantLoop = 0;
+
+	// Si le dernier message reçu est une config permanente, sauve l'EEPROM.
+	// La sauvegarde EEPROM n'écrira pas les octets déjà à la bonne valeur,
+	// donc pas de danger d'écrire pour rien.
+	if (this->MessageIn.IsConfig() && this->MessageIn.IsPermanentConfig())
+	{
+		this->EEPROM_sauvegarde();
+		this->modeConfig = false;
+	}
 }

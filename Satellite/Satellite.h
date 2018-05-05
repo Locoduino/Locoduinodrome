@@ -73,9 +73,10 @@ public:
 	CANBus Bus;
 	CommandCANMessage MessageIn;
 	StatusCANMessage StatusMessage;
+	bool		modeConfig;
 
 	Satellite();
-	void begin();
+	void begin(uint8_t inId);
 	void loop();
 };
 #endif

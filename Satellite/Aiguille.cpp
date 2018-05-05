@@ -25,14 +25,31 @@ void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 
 void Aiguille::loop(Satellite *inpSat)
 {
-	// Configuration
-	switch (inpSat->MessageIn.configButeeState())
+	if (inpSat->MessageIn.IsConfig())
 	{
-	case 2: // butee courante --
-		this->setButee(false);
-		return;
-	case 3: // butee courante ++
-		this->setButee(true);
+		uint8_t number = inpSat->MessageIn.AiguilleToConfig();
+		if (number == this->number)	// Cette aiguille est bien celle à regler...
+			switch (inpSat->MessageIn.AiguilleConfigType())
+			{
+			case AIGUILLE_CONFIG_TYPE::Min:
+				this->servoMoteur.setMin(inpSat->MessageIn.ConfigIntValue());
+				if (inpSat->modeConfig)
+					this->servoMoteur.goTo(0.f);
+				break;
+			case AIGUILLE_CONFIG_TYPE::Max:
+				this->servoMoteur.setMax(inpSat->MessageIn.ConfigIntValue());
+				if (inpSat->modeConfig)
+					this->servoMoteur.goTo(1.f);
+				break;
+			case AIGUILLE_CONFIG_TYPE::Speed:
+				this->servoMoteur.setSpeed(inpSat->MessageIn.ConfigFloatValue());
+				if (inpSat->modeConfig)
+				{
+					this->estDroit = !this->estDroit;
+					this->servoMoteur.goTo(this->estDroit ? 0.0f : 1.0f);
+				}
+				break;
+			}
 		return;
 	}
 
@@ -45,7 +62,7 @@ void Aiguille::loop(Satellite *inpSat)
 	this->servoMoteur.goTo(inEstDroit ? 0.0f : 1.0f);
 }
 
-void Aiguille::setButee(bool inSens)
+/*void Aiguille::setButee(bool inSens)
 {
 	if (this->estDroit)
 	{
@@ -65,6 +82,25 @@ void Aiguille::setButee(bool inSens)
 			maximum++;
 		this->servoMoteur.setMax(maximum);
 	}
+} */
+
+uint8_t Aiguille::EEPROM_sauvegarde(int inAddr)
+{
+	int addr = Objet::EEPROM_sauvegarde(inAddr);
+	unsigned int valeurUInt;
+	float valeurFloat;
+
+	valeurUInt = this->servoMoteur.minimumPulse();
+	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
+	addr += sizeof(unsigned int);
+	valeurUInt = this->servoMoteur.maximumPulse();
+	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
+	addr += sizeof(unsigned int);
+	valeurFloat = this->servoMoteur.minToMaxSpeed() * 10000.f;
+	EEPROMPUT(addr, valeurFloat, sizeof(float));
+	addr += sizeof(float);
+
+	return addr;
 }
 
 uint8_t Aiguille::EEPROM_chargement(int inAddr)
@@ -81,25 +117,6 @@ uint8_t Aiguille::EEPROM_chargement(int inAddr)
 	addr += sizeof(unsigned int);
 	EEPROMGET(addr, valeurFloat, sizeof(float));
 	this->servoMoteur.setSpeed(valeurFloat);
-	addr += sizeof(float);
-
-	return addr;
-}
-
-uint8_t Aiguille::EEPROM_sauvegarde(int inAddr)
-{
-	int addr = Objet::EEPROM_sauvegarde(inAddr);
-	unsigned int valeurUInt;
-	float valeurFloat;
-
-	valeurUInt = this->servoMoteur.minimumPulse();
-	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
-	addr += sizeof(unsigned int);
-	valeurUInt = this->servoMoteur.maximumPulse();
-	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
-	addr += sizeof(unsigned int);
-	valeurFloat = this->servoMoteur.minToMaxSpeed() * 10000.f;
-	EEPROMPUT(addr, valeurFloat, sizeof(float));
 	addr += sizeof(float);
 
 	return addr;
