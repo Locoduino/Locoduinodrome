@@ -19,20 +19,24 @@ const int RETRY_CONNECTION = 10;        // retry connection
 class CANBus
 {
 public:
-	unsigned long CanRxId;
-	unsigned char RxLen = 0;        // length of data, 3 octets by message
+	unsigned long CanRxId;          // commandes ou reglages
+	unsigned char RxLen = 0;        // length of data, 3 octets par message de commande
 	unsigned char RxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
-
+  byte ext;
+  
 	unsigned long CanTxId;
-	unsigned char TxLen = 0;        // length of data, 3 octets by message
-	unsigned char TxBuf[8];         // buffer of data : byte1 : code, byte2 : numero, byte3: info
+	unsigned char TxLen = 0;        // length of data, 1 octet de donnee
+	unsigned char TxBuf[8];         // buffer of data : status
 
 public:
 	void begin(uint8_t id); // init CAN
 
+  // envoi message détecteurs
+  
 	void messageTx();
 
 	// test et lecture message sur bus (CAN)
-	bool messageRx();
+  
+	byte messageRx();
 };
 #endif

@@ -86,10 +86,13 @@ uint8_t Detecteur::EEPROM_chargement(int inAddr)
 	int addr = Objet::EEPROM_chargement(inAddr);
 
 	EEPROMGET(addr, this->intervalle, sizeof(unsigned long));
+  Serial.print("dInt ");Serial.print(this->intervalle); // 100
 	addr += sizeof(unsigned long);
 	EEPROMGET(addr, this->remanence, sizeof(unsigned long));
+  Serial.print(" dRem ");Serial.print(this->remanence); // 1000
 	addr += sizeof(unsigned long);
 	EEPROMGET(addr, this->etatDetecte, sizeof(byte));
+  Serial.print(" dEta ");Serial.println(this->etatDetecte); // 1
 	addr += sizeof(byte);
 
 	return addr;

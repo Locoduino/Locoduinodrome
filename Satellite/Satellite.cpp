@@ -119,7 +119,7 @@ void Satellite::begin(uint8_t inId)
 	for (int i = 0; i < NB_LEDS; i++)
 	{
 		this->AddObjet(&this->leds[i], leds_pins[i], i);
-		// Clignotement demo
+		// Clignotement demo test des leds
 		digitalWrite(leds_pins[i], HIGH);
 		delay(250);
 		digitalWrite(leds_pins[i], LOW);
@@ -139,14 +139,21 @@ void Satellite::begin(uint8_t inId)
 
 void Satellite::loop()
 {
-	// Entre en mode config dès qu'un message de config temporaire est reçu.
-	this->modeConfig = (this->MessageIn.IsConfig() && !this->MessageIn.IsPermanentConfig());
-		
-	if (this->Bus.messageRx())
+  byte IsMessage = this->Bus.messageRx(); // RxBuf : message de commande (1) ou configuration (2) ou rien (0)
+  
+	if (IsMessage == 1)
 	{
-		this->MessageIn.receive(this->Bus.RxBuf); // synchronisation sur les réceptions periodiques
+		this->MessageIn.receive(this->Bus.RxBuf); // recup dans mData[] et synchronisation sur les réceptions periodiques
 		this->Bus.messageTx();                    // des emissions periodiques concernant les capteurs
-	}
+	} 
+  if (IsMessage == 2)
+  {
+    this->ConfigMessage.receive(this->Bus.RxBuf); // recup dans cData[] 
+    // Entre en mode config dès qu'un message de config temporaire est reçu.
+    this->modeConfig = true; //(this->ConfigMessage.IsConfig()) && !this->ConfigMessage.IsPermanentConfig());
+    Serial.print("cfg ");Serial.println(this->modeConfig);
+  }
+ 
 
 	// traite les loop prioritaires
 	Aiguille::loopPrioritaire();
@@ -166,9 +173,10 @@ void Satellite::loop()
 	// Si le dernier message reçu est une config permanente, sauve l'EEPROM.
 	// La sauvegarde EEPROM n'écrira pas les octets déjà à la bonne valeur,
 	// donc pas de danger d'écrire pour rien.
-	if (this->MessageIn.IsConfig() && this->MessageIn.IsPermanentConfig())
+	if (this->modeConfig && this->ConfigMessage.IsPermanentConfig())
 	{
 		this->EEPROM_sauvegarde();
 		this->modeConfig = false;
+    Serial.print("cfg ");Serial.print(this->modeConfig);Serial.println(" Save");
 	}
 }

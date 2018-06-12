@@ -5,9 +5,6 @@
 #include <mcp_can.h>
 #include <mcp_can_dfs.h>
  
-#include "SatelliteWrapper.h"
-#include "Feux.h"
-
 /*
  * Interface CAN
  */
@@ -21,6 +18,11 @@ MCP_CAN canController(spiCS);
 volatile bool FlagReceive = false;      // can interrupt flag
 void MCP2515_ISR() {FlagReceive = true;}
 
+/*
+ * Les satellites
+ */
+#include "SatelliteWrapper.h"
+#include "Feux.h"
 
 /*
  *  Les aiguillages

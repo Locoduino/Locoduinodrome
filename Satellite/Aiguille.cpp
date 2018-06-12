@@ -15,38 +15,38 @@ void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 	this->pin = inPin;	// inutile puisque stockée dans ServoMoteur, mais puisque Objet le permet...
 	this->number = inNumber;
 
-	servoMoteur.setReverted(true);
-	servoMoteur.setInitialPosition(this->estDroit ? 0.0f : 1.0f);
+  pinMode(this->pin, OUTPUT);
 	servoMoteur.setPin(this->pin);
 	servoMoteur.setMin(1200);   // faible amplitude par défaut pour éviter 
-	servoMoteur.setMax(1750);   // trop de contrainte sur l'aiguille avant configuration
+	servoMoteur.setMax(1700);   // trop de contrainte sur l'aiguille avant configuration
 	servoMoteur.setSpeed(2.0);
+  //servoMoteur.setReverted(true);
+  servoMoteur.setInitialPosition(0.5);
+  servoMoteur.goTo(this->estDroit ? 1.0 : 0.0);
 }
 
 void Aiguille::loop(Satellite *inpSat)
 {
-	if (inpSat->MessageIn.IsConfig())
+  // le test inpSat->modeConfig est ajouté dans le if et enlevé dans les case
+	if (inpSat->modeConfig && inpSat->ConfigMessage.IsConfig() && inpSat->ConfigMessage.AiguilleToConfig())
 	{
-		uint8_t number = inpSat->MessageIn.AiguilleToConfig();
+		uint8_t number = inpSat->ConfigMessage.NumAiguilleToConfig();
 		if (number == this->number)	// Cette aiguille est bien celle à regler...
-			switch (inpSat->MessageIn.AiguilleConfigType())
+			switch (inpSat->ConfigMessage.AiguilleConfigType())
 			{
 			case AIGUILLE_CONFIG_TYPE::Min:
-				this->servoMoteur.setMin(inpSat->MessageIn.ConfigIntValue());
-				if (inpSat->modeConfig)
-					this->servoMoteur.goTo(0.f);
+				this->servoMoteur.setMin(inpSat->ConfigMessage.ConfigIntValue());
+			  this->servoMoteur.goTo(0.0);
 				break;
 			case AIGUILLE_CONFIG_TYPE::Max:
-				this->servoMoteur.setMax(inpSat->MessageIn.ConfigIntValue());
-				if (inpSat->modeConfig)
-					this->servoMoteur.goTo(1.f);
+				this->servoMoteur.setMax(inpSat->ConfigMessage.ConfigIntValue());
+			  this->servoMoteur.goTo(1.0);
 				break;
 			case AIGUILLE_CONFIG_TYPE::Speed:
-				this->servoMoteur.setSpeed(inpSat->MessageIn.ConfigFloatValue());
-				if (inpSat->modeConfig)
+				this->servoMoteur.setSpeed(inpSat->ConfigMessage.ConfigFloatValue());
 				{
-					this->estDroit = !this->estDroit;
-					this->servoMoteur.goTo(this->estDroit ? 0.0f : 1.0f);
+				this->estDroit = !this->estDroit;
+				this->servoMoteur.goTo(this->estDroit ? 0.0 : 1.0);
 				}
 				break;
 			}
@@ -54,35 +54,14 @@ void Aiguille::loop(Satellite *inpSat)
 	}
 
 	// Execution
-	uint8_t inEstDroit = inpSat->MessageIn.pointState();
-	if ((bool)inEstDroit == this->estDroit)
-		return;
-
-	this->estDroit = (bool)inEstDroit;
-	this->servoMoteur.goTo(inEstDroit ? 0.0f : 1.0f);
+	bool inEstDroit = inpSat->MessageIn.pointState();
+	if (inEstDroit == this->estDroit)
+		return; // pas de changement
+  
+	this->estDroit = inEstDroit;
+	this->servoMoteur.goTo(this->estDroit ? 1.0 : 0.0);
 }
 
-/*void Aiguille::setButee(bool inSens)
-{
-	if (this->estDroit)
-	{
-		int minimum = this->servoMoteur.minimumPulse();
-		if (inSens)
-			minimum--;
-		else
-			minimum++;
-		this->servoMoteur.setMin(minimum);
-	}
-	else
-	{
-		int maximum = this->servoMoteur.maximumPulse();
-		if (inSens)
-			maximum--;
-		else
-			maximum++;
-		this->servoMoteur.setMax(maximum);
-	}
-} */
 
 uint8_t Aiguille::EEPROM_sauvegarde(int inAddr)
 {
@@ -111,12 +90,15 @@ uint8_t Aiguille::EEPROM_chargement(int inAddr)
 
 	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
 	this->servoMoteur.setMin(valeurUInt);
+  Serial.print("aMin ");Serial.print(valeurUInt); // 1200
 	addr += sizeof(unsigned int);
 	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
 	this->servoMoteur.setMax(valeurUInt);
+  Serial.print(" aMax ");Serial.print(valeurUInt); //1700
 	addr += sizeof(unsigned int);
 	EEPROMGET(addr, valeurFloat, sizeof(float));
-	this->servoMoteur.setSpeed(valeurFloat);
+	this->servoMoteur.setSpeed(valeurFloat / 10000.f);
+  Serial.print(" aVit ");Serial.println(valeurFloat/10000.f); //2.00
 	addr += sizeof(float);
 
 	return addr;

@@ -73,7 +73,8 @@ public:
 	CANBus Bus;
 	CommandCANMessage MessageIn;
 	StatusCANMessage StatusMessage;
-	bool		modeConfig;
+  ConfigCANMessage ConfigMessage;
+	bool	modeConfig;
 
 	Satellite();
 	void begin(uint8_t inId);

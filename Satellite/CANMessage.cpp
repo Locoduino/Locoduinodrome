@@ -31,13 +31,7 @@ uint8_t CommandCANMessage::ledState(const uint8_t inLedNumber)
 
 bool CommandCANMessage::pointState()
 {
-  return (mData[2] & 0x80) != 0;
-}
-
-uint8_t CommandCANMessage::configButeeState()
-{
-  return ((mData[2] & 0x60) >> 5);
-  // 0 = rien, 2 = --, 3 = ++
+  return ((mData[2] & 0x80) != 0);
 }
 
 void CommandCANMessage::receive(uint8_t *inData)
@@ -61,6 +55,20 @@ void StatusCANMessage::setDetection(uint8_t *inData, const uint8_t inDetectNumbe
 {
   bitWrite(dData[0], inDetectNumber, inDetectState);
   inData[0] = dData[0];
+}
+
+ConfigCANMessage::ConfigCANMessage()
+{
+  /* Initialise la trame des détecteurs tous Libres */
+  cData[0] = cData[1] = cData[2] = cData[3] = cData[4] = cData[5] = 0;
+}
+
+void ConfigCANMessage::receive(uint8_t *inData)
+{
+  for (int b=0;b<8;b++) 
+  {
+  cData[b] = inData[b];
+  }
 }
 
 
