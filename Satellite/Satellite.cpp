@@ -151,9 +151,10 @@ void Satellite::loop()
     this->ConfigMessage.receive(this->Bus.RxBuf); // recup dans cData[] 
     // Entre en mode config dès qu'un message de config temporaire est reçu.
     this->modeConfig = true; //(this->ConfigMessage.IsConfig()) && !this->ConfigMessage.IsPermanentConfig());
-    Serial.print("cfg ");Serial.println(this->modeConfig);
-  }
- 
+#ifdef DEBUG_MODE
+		Serial.println("cfg DEBUT");
+#endif
+  }	 
 
 	// traite les loop prioritaires
 	Aiguille::loopPrioritaire();
@@ -172,11 +173,13 @@ void Satellite::loop()
 
 	// Si le dernier message reçu est une config permanente, sauve l'EEPROM.
 	// La sauvegarde EEPROM n'écrira pas les octets déjà à la bonne valeur,
-	// donc pas de danger d'écrire pour rien.
+	// donc pas de danger d'écrire pour rien et d'user l'EEPROM.
 	if (this->modeConfig && this->ConfigMessage.IsPermanentConfig())
 	{
 		this->EEPROM_sauvegarde();
 		this->modeConfig = false;
-    Serial.print("cfg ");Serial.print(this->modeConfig);Serial.println(" Save");
+#ifdef DEBUG_MODE
+		Serial.println("cfg FIN ");Serial.println(" Save");
+#endif
 	}
 }

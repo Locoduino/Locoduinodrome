@@ -12,8 +12,7 @@
  * 
  * Cette version contient des Serial.print pour débugger
  * notamment l'affichage des valeurs en EEPROM
- * les emssages CAN reçus
- * l'état des aiguilles
+ * les messages CAN reçus et l'état des aiguilles.
  */
 
 #include "Satellite.h"

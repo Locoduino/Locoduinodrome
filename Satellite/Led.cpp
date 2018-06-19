@@ -29,30 +29,30 @@ void Led::loop(Satellite *inpSat)
 			{
 			case LED_CONFIG_TYPE::Maximum:
 				this->dimmer.setMax(inpSat->ConfigMessage.ConfigByteValue());
-          this->dimmer.update();
-					this->dimmer.stopBlink();
-          this->dimmer.off();
-					this->dimmer.on();
+        this->dimmer.update();
+				this->dimmer.stopBlink();
+        this->dimmer.off();
+				this->dimmer.on();
 				break;
 			case LED_CONFIG_TYPE::BrighteningTime:
 				this->dimmer.setBrighteningTime(inpSat->ConfigMessage.ConfigIntValue());
-					this->dimmer.stopBlink();
-					this->dimmer.off();
-					this->dimmer.on();
+				this->dimmer.stopBlink();
+				this->dimmer.off();
+				this->dimmer.on();
 				break;
 			case LED_CONFIG_TYPE::FadingTime:
 				this->dimmer.setFadingTime(inpSat->ConfigMessage.ConfigIntValue());
-					this->dimmer.stopBlink();
-					this->dimmer.on();
-					this->dimmer.off();
+				this->dimmer.stopBlink();
+				this->dimmer.on();
+				this->dimmer.off();
 				break;
 			case LED_CONFIG_TYPE::OnTime:
 				this->dimmer.setOnTime(inpSat->ConfigMessage.ConfigIntValue());
-					this->dimmer.startBlink();
+				this->dimmer.startBlink();
 				break;
 			case LED_CONFIG_TYPE::Period:
 				this->dimmer.setPeriod(inpSat->ConfigMessage.ConfigIntValue());
-					this->dimmer.startBlink();
+				this->dimmer.startBlink();
 				break;
 			}
 		return;
@@ -99,23 +99,37 @@ uint8_t Led::EEPROM_chargement(int inAddr)
 
 	EEPROMGET(addr, valeur8, sizeof(uint8_t));
 	this->dimmer.setMax(valeur8);
-  Serial.print("lMax ");Serial.print(valeur8); // 255
+#ifdef DEBUG_MODE
+	Serial.print("lMax ");Serial.print(valeur8); // 255
+#endif
 	addr += sizeof(uint8_t);
+
 	EEPROMGET(addr, valeur16, sizeof(uint16_t));
 	this->dimmer.setFadingTime(valeur16);
-  Serial.print(" lFad ");Serial.print(valeur16); // 250
+#ifdef DEBUG_MODE
+	Serial.print(" lFad ");Serial.print(valeur16); // 250
+#endif
 	addr += sizeof(uint16_t);
+
 	EEPROMGET(addr, valeur16, sizeof(uint16_t));
 	this->dimmer.setBrighteningTime(valeur16);
-  Serial.print(" lBri ");Serial.print(valeur16); // 250
+#ifdef DEBUG_MODE
+	Serial.print(" lBri ");Serial.print(valeur16); // 250
+#endif
 	addr += sizeof(uint16_t);
+
 	EEPROMGET(addr, valeur16, sizeof(uint16_t));
 	this->dimmer.setOnTime(valeur16);
-  Serial.print(" lTim ");Serial.print(valeur16); // 200
+#ifdef DEBUG_MODE
+	Serial.print(" lTim ");Serial.print(valeur16); // 200
+#endif
 	addr += sizeof(uint16_t);
+
 	EEPROMGET(addr, valeur16, sizeof(uint16_t));
 	this->dimmer.setPeriod(valeur16);
-  Serial.print(" lPer ");Serial.println(valeur16); // 900
+#ifdef DEBUG_MODE
+	Serial.print(" lPer ");Serial.println(valeur16); // 900
+#endif
 	addr += sizeof(uint16_t);
 
 	return addr;

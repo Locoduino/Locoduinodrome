@@ -50,6 +50,8 @@
 #define NB_AIGUILLES	1
 #define NB_DETECTEURS	3
 
+#define DEBUG_MODE
+
 class Satellite
 {
 private:
