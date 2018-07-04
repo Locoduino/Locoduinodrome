@@ -56,7 +56,14 @@ void CANBus::begin(uint8_t id) // init CAN
 
 	CanTxId = 0x10 + id;                           // messages emis = 0x10 + Id
 #ifdef DEBUG_MODE
-	Serial.print("CAN initialise avec id 0x"); Serial.println(CanTxId, HEX);
+  if (repeat > 0)
+  {
+	  Serial.print("CAN OK avec id 0x"); Serial.println(CanTxId, HEX);
+  } 
+	else 
+	{
+    Serial.print("CAN NOK "); Serial.println(id, HEX);
+  }
 #endif
 
   /*

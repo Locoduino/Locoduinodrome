@@ -34,12 +34,14 @@ void Aiguille::loop(Satellite *inpSat)
 			switch (inpSat->ConfigMessage.AiguilleConfigType())
 			{
 			case AIGUILLE_CONFIG_TYPE::Min:
-				this->servoMoteur.setMin(inpSat->ConfigMessage.ConfigIntValue());
-				this->servoMoteur.goTo(0.0);
+				this->servoMoteur.setupMin(inpSat->ConfigMessage.ConfigIntValue());
+        this->servoMoteur.endSetup();
+			  //this->servoMoteur.goTo(0.0);
 				break;
 			case AIGUILLE_CONFIG_TYPE::Max:
-				this->servoMoteur.setMax(inpSat->ConfigMessage.ConfigIntValue());
-				this->servoMoteur.goTo(1.0);
+				this->servoMoteur.setupMax(inpSat->ConfigMessage.ConfigIntValue());
+			  this->servoMoteur.endSetup();
+			  //this->servoMoteur.goTo(1.0);
 				break;
 			case AIGUILLE_CONFIG_TYPE::Speed:
 				this->servoMoteur.setSpeed(inpSat->ConfigMessage.ConfigFloatValue());
