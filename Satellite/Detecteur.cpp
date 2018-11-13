@@ -54,17 +54,13 @@ void Detecteur::loop(Satellite *inpSat)
 		{
 			inpSat->StatusMessage.setDetection(inpSat->Bus.TxBuf, this->number, false);
 			inpSat->Bus.messageTx();
-#ifdef DEBUG_MODE
 			Serial.println(F("Lib"));
-#endif
 		}
 		else
 		{
 			inpSat->StatusMessage.setDetection(inpSat->Bus.TxBuf, this->number, true);
 			inpSat->Bus.messageTx();
-#ifdef DEBUG_MODE
 			Serial.println(F("Occ"));
-#endif
 		}
 		this->etatPrecedent = activ;
 	}
@@ -90,20 +86,15 @@ uint8_t Detecteur::EEPROM_chargement(int inAddr)
 	int addr = Objet::EEPROM_chargement(inAddr);
 
 	EEPROMGET(addr, this->intervalle, sizeof(unsigned long));
-#ifdef DEBUG_MODE
-	Serial.print("dInt ");Serial.print(this->intervalle); // 100
-#endif
+  Serial.print("dInt ");Serial.print(this->intervalle); // 100
 	addr += sizeof(unsigned long);
 	EEPROMGET(addr, this->remanence, sizeof(unsigned long));
-#ifdef DEBUG_MODE
-	Serial.print(" dRem ");Serial.print(this->remanence); // 1000
-#endif
+  Serial.print(" dRem ");Serial.print(this->remanence); // 1000
 	addr += sizeof(unsigned long);
 	EEPROMGET(addr, this->etatDetecte, sizeof(byte));
-#ifdef DEBUG_MODE
-	Serial.print(" dEta ");Serial.println(this->etatDetecte); // 1
-#endif
+  Serial.print(" dEta ");Serial.println(this->etatDetecte); // 1
 	addr += sizeof(byte);
 
 	return addr;
 }
+

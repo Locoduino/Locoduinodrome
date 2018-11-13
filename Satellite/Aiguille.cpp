@@ -15,18 +15,19 @@ void Aiguille::begin(uint8_t inPin, uint8_t inNumber)
 	this->pin = inPin;	// inutile puisque stockée dans ServoMoteur, mais puisque Objet le permet...
 	this->number = inNumber;
 
-	pinMode(this->pin, OUTPUT);
+  pinMode(this->pin, OUTPUT);
 	servoMoteur.setPin(this->pin);
 	servoMoteur.setMin(1200);   // faible amplitude par défaut pour éviter 
 	servoMoteur.setMax(1700);   // trop de contrainte sur l'aiguille avant configuration
 	servoMoteur.setSpeed(2.0);
-	servoMoteur.setInitialPosition(0.5);
-	servoMoteur.goTo(this->estDroit ? 1.0 : 0.0);
+  //servoMoteur.setReverted(true);
+  servoMoteur.setInitialPosition(0.5);
+  servoMoteur.goTo(this->estDroit ? 1.0 : 0.0);
 }
 
 void Aiguille::loop(Satellite *inpSat)
 {
-	// le test inpSat->modeConfig est ajouté dans le if et enlevé dans les case
+  // le test inpSat->modeConfig est ajouté dans le if et enlevé dans les case
 	if (inpSat->modeConfig && inpSat->ConfigMessage.IsConfig() && inpSat->ConfigMessage.AiguilleToConfig())
 	{
 		uint8_t number = inpSat->ConfigMessage.NumAiguilleToConfig();
@@ -71,11 +72,9 @@ uint8_t Aiguille::EEPROM_sauvegarde(int inAddr)
 	valeurUInt = this->servoMoteur.minimumPulse();
 	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
 	addr += sizeof(unsigned int);
-
 	valeurUInt = this->servoMoteur.maximumPulse();
 	EEPROMPUT(addr, valeurUInt, sizeof(unsigned int));
 	addr += sizeof(unsigned int);
-
 	valeurFloat = this->servoMoteur.minToMaxSpeed() * 10000.f;
 	EEPROMPUT(addr, valeurFloat, sizeof(float));
 	addr += sizeof(float);
@@ -91,22 +90,17 @@ uint8_t Aiguille::EEPROM_chargement(int inAddr)
 
 	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
 	this->servoMoteur.setMin(valeurUInt);
-#ifdef DEBUG_MODE
-	Serial.print("aMin "); Serial.print(valeurUInt); // DEBUG 1200
-#endif
+  Serial.print("aMin ");Serial.print(valeurUInt); // 1200
 	addr += sizeof(unsigned int);
 	EEPROMGET(addr, valeurUInt, sizeof(unsigned int));
 	this->servoMoteur.setMax(valeurUInt);
-#ifdef DEBUG_MODE
-	Serial.print(" aMax "); Serial.print(valeurUInt); // DEBUG 1700
-#endif
+  Serial.print(" aMax ");Serial.print(valeurUInt); //1700
 	addr += sizeof(unsigned int);
 	EEPROMGET(addr, valeurFloat, sizeof(float));
 	this->servoMoteur.setSpeed(valeurFloat / 10000.f);
-#ifdef DEBUG_MODE
-	Serial.print(" aVit "); Serial.println(valeurFloat / 10000.f); // DEBUG 2.00
-#endif
+  Serial.print(" aVit ");Serial.println(valeurFloat/10000.f); //2.00
 	addr += sizeof(float);
 
 	return addr;
 }
+

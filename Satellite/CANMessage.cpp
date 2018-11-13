@@ -67,8 +67,9 @@ void ConfigCANMessage::receive(uint8_t *inData)
 {
   for (int b=0;b<8;b++) 
   {
-    cData[b] = inData[b];
+  cData[b] = inData[b];
   }
 }
+
 
 

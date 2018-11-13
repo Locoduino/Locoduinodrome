@@ -19,3 +19,4 @@ static const uint8_t LED_BLINK = 0x1;
 static const uint8_t LED_ON = 0x2;
 
 #endif /* __MESSAGING_H__ */
+

@@ -33,3 +33,4 @@ public:
 	uint8_t EEPROM_sauvegarde(int inAddr);
 };
 #endif
+
