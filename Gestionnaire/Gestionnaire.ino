@@ -8,8 +8,8 @@
 /*
  * Interface CAN
  */
-//const uint8_t spiCS = 9;
-const uint8_t spiCS = 53; // sur un Mega
+const uint8_t spiCS = 9;  // pour un Uno
+//const uint8_t spiCS = 53; // sur un Mega
 
 MCP_CAN canController(spiCS);
 
@@ -45,20 +45,39 @@ SemaphoreRalentissementSignalWrapper    S3wrapper(8, 3, SIGNAL_1); /* signal 8 d
 SemaphoreRalentissementSignalWrapper    S4wrapper(9, 4, SIGNAL_1); /* signal 9 du gestionnaire sur satellite 4, slot 1 */
 
 /*
- * Pour l'automate de test
+ * Pour l'animation des signaux dans Loop
  */
 
 unsigned long tempo;
-int nsig = 0;
 int sig = 0;
 unsigned int feu = 1;
+
+///////////////////////////////////////////
 
 void setup()
 {
   Serial.begin(115200);
 
+ // init CAN
+
+  canController.start();
   
-  while (CAN_OK != canController.begin(CAN_500KBPS))              // init can bus : baudrate = 500k
+ /*
+  * set mask & filters
+  */
+  
+  canController.init_Mask(0, 0, 0x3F0);               // there are 2 mask in mcp2515, you need to set both of them
+  canController.init_Mask(1, 0, 0x3F0);               // precisement : Id 0x10 à 0x4F
+  // filtres du buffer 0
+  canController.init_Filt(0, 0, 0x10);                // Reception possible : Id 10 & 1F (hex)  : Satellites
+  canController.init_Filt(1, 0, 0x40);                // Reception possible : Id 4x (hex) 
+  // filtres du buffer 1
+  canController.init_Filt(2, 0, 0x10);                // Reception possible : Id 1x (hex) 
+  canController.init_Filt(3, 0, 0x40);                // Reception possible : Id 4x (hex) 40 conduite via centrale DCC
+  canController.init_Filt(4, 0, 0x43);                // Reception possible : Id 4x (hex) 43 keepalive
+  canController.init_Filt(5, 0, 0x48);                // Reception possible : Id 4x (hex) 48 etat DCC
+  
+  while (CAN_OK != canController.begin(CAN_500KBPS))              // init can bus : baudrate = 500k (carte NiRem a 16 Mhz)
   {
     Serial.println("CAN BUS Shield init fail");
     delay(100);
@@ -75,14 +94,16 @@ void setup()
   tempo = millis();
 }
 
+///////////////////////////////////////////
+
 void loop()
 {
-  /*
-   * test des signaux et aiguilles 
-   */
+  
+  // réception d'un message Can
+
   unsigned char len = 0;
   unsigned char buf[8];
-  bool timeOK;
+
   if(FlagReceive)                      // test si message
   {
     FlagReceive=0;
@@ -102,6 +123,8 @@ void loop()
     }
   }
 
+  // une animation des signaux
+  
   if (millis() - tempo > 500)
   {
     tempo = millis();
@@ -114,11 +137,11 @@ void loop()
       if (feu == 0) feu = 1;
     }
   }
-
-  CommandeDirecte();
   
   sendSatelliteMessage();
 }
+
+// utilitaire de commande d'une aiguille a en position i
 
 void Aiguille(int a, bool i)
 {
@@ -127,8 +150,9 @@ void Aiguille(int a, bool i)
   printOutBuffers();
 }
 
+// utilitaire de commande d'un signal nsig avec un type de feux f
 
-void Signal(unsigned int f)
+void Signal(int nsig, unsigned int f)
 {
   switch (nsig)
   {
@@ -140,7 +164,7 @@ void Signal(unsigned int f)
     case 5:
     case 6:
     case 7:
-    Serial.print("Carre ");Serial.println(nsig);
+    Serial.print("Carre ");Serial.println();
     break;
     case 2:
     case 3:
@@ -155,87 +179,4 @@ void Signal(unsigned int f)
   printOutBuffers();
 }
 
-void CommandeDirecte()
-{
-  if (Serial.available()) 
-  {
-    char code=Serial.read(); 
-    switch (code)
-    {
-      case 'X':
-      Aiguille(0, true);
-      break;
-      case 'x':
-      Aiguille(0, false);
-      break;
-      case 'Y':
-      Aiguille(1, true);
-      break;
-      case 'y':
-      Aiguille(1, false);
-      break;
-      case '=':
-      Serial.print("No Signal = ");Serial.println(nsig);
-      break;
-      case '+':
-      if (nsig < 9) {nsig++;Serial.print("No Signal = ");Serial.println(nsig);}
-      break;
-      case '-':
-      if (nsig > 0) {nsig--;Serial.print("No Signal = ");Serial.println(nsig);}
-      break;
-      case '0':
-      Signal(E);
-      break;
-      case '1':
-      Signal(Vl);
-      break;
-      case '2':
-      Signal(A);
-      break;
-      case '3':
-      Signal(S);
-      break;
-      case '4':
-      Signal(C);
-      break;
-      case '5':
-      Signal(R);
-      break;
-      case '6':
-      Signal(RR);
-      break;
-      case '7':
-      Signal(M);
-      break;
-      case '8':
-      Signal(Cv);
-      break;
-      case '9':
-      Signal(Vlc);
-      break;
-      case 'a':
-      Signal(Ac);
-      break;
-      case 'b':
-      Signal(Sc);
-      break;
-      case 'c':
-      Signal(Rc);
-      break;
-      case 'd':
-      Signal(RRc);
-      break;
-      case 'e':
-      Signal(Mc);
-      break;
-      case 'f':
-      Signal(D);
-      break;
-      case 'g':
-      Signal(X);
-      break;     
-    }
-  } 
-}
-
-
+///////////////////////////////////////////
