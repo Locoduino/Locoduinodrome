@@ -1,7 +1,7 @@
 /*
  * LOCODUINO
  *
- * Locoduinodrome
+ * Locoduinodrome SAM
  *
  * Config des satellites
  */

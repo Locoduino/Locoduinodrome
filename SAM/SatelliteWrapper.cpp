@@ -1,11 +1,11 @@
 /*
  * LOCODUINO
  *
- * Locoduinodrome
+ * Locoduinodrome SAM
  *
- * Classe de wrapping des satellites dans le gestionnaire.
+ * Classe de wrapping des satellites dans SAM.
  *
- * Ces classes permettent au gestionnaire de s'interfacer à la messagerie
+ * Ces classes permettent a SAM de s'interfacer à la messagerie
  * CAN lui permettant de dialoguer avec les satellites.
  */
 
@@ -74,7 +74,7 @@ int16_t PointWrapper::sHigherPointNumber = -1;
  * Constructeur.
  *
  * Chaque objet PointWrapper établit une correspondance entre l'identifiant
- * de l'aiguillage dans le gestionnaire et le numéro du satellite qui
+ * de l'aiguillage dans SAM et le numéro du satellite qui
  * contrôle cet aiguillage. Le constructeur constitue également une liste de
  * ces objets qui est ensuite exploité dans begin.
  */
@@ -89,13 +89,13 @@ mSatelliteIndex(NO_SATELLITE_INDEX)
   /* Ajoute l'aiguillage dans la liste */
   mNext = sPointList;
   sPointList = this;
-  /* Note le max des identifiants d'aiguillage dans le gestionnaire */
+  /* Note le max des identifiants d'aiguillage dans SAM */
   if (mPointNumber > sHigherPointNumber) sHigherPointNumber = mPointNumber;
 }
 
 /*
- * begin construit la table indexée par l'identifiant d'aiguillage dans le
- * gestionnaire et l'objet PointWrapper qui établit la correspondance
+ * begin construit la table indexée par l'identifiant d'aiguillage dans 
+ * SAM et l'objet PointWrapper qui établit la correspondance
  * entre l'identifiant d'aiguillage et l'identifiant du satellite qui le
  * commande. Il n'est pas nécessaire que les identifiants soient de un en un
  * mais la consommation mémoire dépend du max des identifiants.
@@ -205,7 +205,7 @@ mSlot(inSlot)
   /* Ajoute l'aiguillage dans la liste */
   mNext = sSignalList;
   sSignalList = this;
-  /* Note le max des identifiants d'aiguillage dans le gestionnaire */
+  /* Note le max des identifiants d'aiguillage dans SAM */
   if (mSignalNumber > sHigherSignalNumber) sHigherSignalNumber = mSignalNumber;
 }
 

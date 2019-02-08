@@ -1,7 +1,7 @@
 /*
  * LOCODUINO
  *
- * Locoduinodrome
+ * Locoduinodrome SAM
  *
  * Classe pour les messages CAN
  */

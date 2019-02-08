@@ -1,11 +1,11 @@
 /*
  * LOCODUINO
  *
- * Locoduinodrome
+ * Locoduinodrome SAM
  *
- * Classe de wrapping des satellites dans le gestionnaire.
+ * Classe de wrapping des satellites dans SAM.
  *
- * Ces classes permettent au gestionnaire de s'interfacer à la messagerie
+ * Ces classes permettent a SAM de s'interfacer à la messagerie
  * CAN lui permettant de dialoguer avec les satellites.
  */
 
@@ -26,7 +26,7 @@ private:
   static PointWrapper **sPointTable;
   static int16_t sHigherPointNumber;
 
-  int16_t mPointNumber;    /* numéro de l'aiguillage dans le gestionnaire */
+  int16_t mPointNumber;    /* numéro de l'aiguillage dans SAM */
   uint8_t mSatelliteId;    /* indentifiant du satellite                   */
   uint8_t mSatelliteIndex; /* index du satellite dans la table            */
   PointWrapper *mNext;
@@ -61,7 +61,7 @@ enum { SIGNAL_0 = 0, SIGNAL_1 = 3, SIGNAL_2 = 6 };
 
 /*-----------------------------------------------------------------------------
  * La classe SignalWrapper est une classe abtraite représentant
- * la correspondance entre un signal du gestionnaire et le signal matériel
+ * la correspondance entre un signal de SAM et le signal matériel
  * sur le satellite.
  */
 class SignalWrapper
@@ -71,7 +71,7 @@ private:
   static SignalWrapper **sSignalTable;
   static int16_t sHigherSignalNumber;
 
-  int16_t mSignalNumber;    /* Numéro du signal dans le gestionnaire */
+  int16_t mSignalNumber;    /* Numéro du signal dans SAM */
   uint8_t mSatelliteId;     /* Identifiant du satellite sur lequel le signal est implanté */
   SignalWrapper *mNext;
 

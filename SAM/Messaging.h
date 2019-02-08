@@ -1,9 +1,9 @@
 /*
  * LOCODUINO
  *
- * Locoduinodrome
+ * Locoduinodrome SAM
  *
- * Constantes liées à la messagerie, partagées entre gestionnaire
+ * Constantes liées à la messagerie, partagées entre SAM
  * et satellite.
  */
 
