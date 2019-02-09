@@ -143,7 +143,7 @@ void loop()
 
 // utilitaire de commande d'une aiguille a en position i
 
-void Aiguille(int a, bool i)
+void aiguille(int a, bool i)
 {
   Serial.print("Aiguille ");Serial.println(a);
   PointWrapper::setPointPosition(a,i);
@@ -152,7 +152,7 @@ void Aiguille(int a, bool i)
 
 // utilitaire de commande d'un signal nsig avec un type de feux f
 
-void Signal(int nsig, unsigned int f)
+void signal(int nsig, unsigned int f)
 {
   switch (nsig)
   {
