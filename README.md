@@ -11,3 +11,6 @@ L'un des deux gestionnaires, celui de Pierre, a été installé dans un Arduino 
 
 Le middleware SAM est décrit dans l'article :
 [https://www.locoduino.org/spip.php?article243]()
+
+Le configurateur de satellites est décrit dans l'article :
+[https://www.locoduino.org/spip.php?article249]()
